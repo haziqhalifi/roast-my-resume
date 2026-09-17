@@ -1,0 +1,25 @@
+Priya Raman
+Backend Engineer | priya.raman@example.com | +60 12-345 6789 | Kuala Lumpur | linkedin.com/in/priyaraman
+
+EXPERIENCE
+
+Senior Backend Engineer, Grab | Kuala Lumpur | Mar 2021 – Present
+- Cut payment API p95 latency from 820ms to 210ms by redesigning the ledger write path in Go and PostgreSQL
+- Led migration of 14 services from a monolith to Kubernetes, reducing deploy time from 45 to 6 minutes
+- Built an idempotency layer that eliminated duplicate charges, saving an estimated RM1.2M per year
+- Mentor 4 engineers; 2 promoted to mid-level within 18 months
+
+Backend Engineer, iPay88 | Kuala Lumpur | Jul 2018 – Feb 2021
+- Designed a fraud-scoring service processing 3M transactions per day with 99.95% uptime
+- Reduced false-positive fraud flags by 32% by adding merchant-level velocity features
+- Automated reconciliation reports, saving the finance team 20 hours per week
+
+EDUCATION
+
+BEng Software Engineering, Universiti Teknologi Malaysia | 2018 | First Class Honours
+
+SKILLS
+
+Languages: Go, Python, SQL
+Infrastructure: PostgreSQL, Kafka, Redis, Kubernetes, Terraform, AWS
+Practices: Distributed systems, observability (Prometheus, Grafana), incident response

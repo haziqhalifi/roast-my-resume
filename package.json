@@ -1,0 +1,16 @@
+{
+  "name": "roast-my-resume",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env server.js",
+    "start:eval": "ROASTS_PER_DEVICE_PER_DAY=999 ROASTS_PER_IP_PER_DAY=999 ROASTS_PER_DAY=999 USAGE_FILE=./data/usage-eval.json node --env-file=.env server.js",
+    "test": "node --test",
+    "eval": "node eval/run.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roast My Resume 🔥</title>
+<style>
+  :root {
+    --black: #0c0c0e;
+    --panel: #111113;
+    --paper: #f4f1ea;
+    --yellow: #f4c81a;
+    --red: #e8401e;
+    --line: #1f1f22;
+    --muted: #9a9a9f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--black);
+    max-width: 560px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+  }
+  .mono { font-family: "SF Mono", "Menlo", "Consolas", monospace; }
+
+  /* Header */
+  header {
+    background: var(--black);
+    color: #fff;
+    padding: 24px 20px 20px;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    padding: 6px 10px;
+    border: 2px solid var(--yellow);
+  }
+  .archive-icon {
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--yellow);
+    color: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  h1 {
+    font-size: 3rem;
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+  h1 .highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--yellow);
+    color: var(--black);
+    padding: 0 10px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .asterisk { color: var(--red); font-size: 1.5rem; }
+  .subtitle {
+    color: #b7b7bb;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 16px 0 0;
+    max-width: 90%;
+  }
+
+  /* Warning marquee */
+  .marquee {
+    background: var(--yellow);
+    color: var(--black);
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-top: 2px solid var(--black);
+    border-bottom: 2px solid var(--black);
+  }
+  .marquee-track {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 14s linear infinite;
+  }
+  @keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* Sections */
+  main { padding: 26px 20px 0; }
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-num {
+    background: var(--black);
+    color: var(--yellow);
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 4px 9px;
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  .section-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .tab {
+    background: #fff;
+    border: 2px solid var(--black);
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    color: var(--black);
+    box-shadow: 3px 3px 0 var(--black);
+    transition: transform 0.05s ease;
+  }
+  .tab:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--black); }
+  .tab .icon { font-size: 1.3rem; }
+  .tab.active { background: var(--yellow); }
+
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    border: 2px solid var(--black);
+    background: #fff;
+    color: var(--black);
+    resize: vertical;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+  textarea::placeholder { color: #9a9a9f; }
+  textarea:focus { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  .upload-zone {
+    border: 2px dashed var(--black);
+    background: #fff;
+    padding: 30px 14px;
+    text-align: center;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+  .upload-zone input[type="file"] { display: none; }
+  .upload-zone label {
+    display: inline-block;
+    font-weight: 800;
+    background: var(--black);
+    color: #fff;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+  .upload-filename {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    word-break: break-all;
+  }
+
+  /* Roast style picker */
+  .styles { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .style-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff;
+    border: 2px solid var(--black);
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--black);
+    transition: transform 0.05s ease;
+  }
+  .style-card:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--black); }
+  .style-card.active { background: var(--yellow); }
+  .style-check {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--black);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+  }
+  .style-card.active .style-check { background: var(--red); }
+  .style-card.active .style-check::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #fff;
+  }
+  .style-body { flex: 1; min-width: 0; }
+  .style-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .style-name {
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .style-tag {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: right;
+  }
+  .style-desc { font-size: 0.85rem; color: #4b4b4f; margin-top: 4px; }
+
+  /* Submit */
+  #roastBtn {
+    width: 100%;
+    padding: 18px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: none;
+    background: var(--red);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--black);
+    transition: transform 0.05s ease;
+  }
+  #roastBtn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--black); }
+  #roastBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .footnote {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    margin-top: 14px;
+  }
+
+  #error {
+    color: var(--red);
+    font-weight: 700;
+    margin-top: 14px;
+    display: none;
+  }
+
+  /* Wrapped-style result card */
+  #resultWrap {
+    display: none;
+    margin-top: 26px;
+  }
+  .wrapped-card {
+    --accent: var(--yellow);
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 9 / 16;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--wrapped-bg, linear-gradient(165deg, #1a0402 0%, #3a0d05 45%, #e8401e 130%));
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .wrapped-card[data-theme="savage"] { --wrapped-bg: linear-gradient(165deg, #1a0402 0%, #3a0d05 45%, #e8401e 130%); --accent: #f4c81a; }
+  .wrapped-card[data-theme="corporate"] { --wrapped-bg: linear-gradient(165deg, #060b16 0%, #0e2144 45%, #2f6fe0 130%); --accent: #8fc6ff; }
+  .wrapped-card[data-theme="constructive"] { --wrapped-bg: linear-gradient(165deg, #04120c 0%, #0b3527 45%, #1fae72 130%); --accent: #b7ffe0; }
+  .wrapped-card[data-theme="shakespearean"] { --wrapped-bg: linear-gradient(165deg, #14061f 0%, #3a1155 45%, #a24fe8 130%); --accent: #f4c81a; }
+
+  .wrapped-dots {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    gap: 5px;
+    z-index: 5;
+  }
+  .wrapped-dot {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,0.28);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .wrapped-dot::after {
+    content: "";
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: #fff;
+  }
+  .wrapped-dot.done::after { width: 100%; }
+  .wrapped-dot.active::after { width: 100%; transition: width 5s linear; }
+
+  .wrapped-tap-zones {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    z-index: 4;
+  }
+  .wrapped-tap-zones span { flex: 1; }
+
+  .wrapped-slides {
+    position: absolute;
+    inset: 0;
+  }
+  .wrapped-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 34px 22px 22px;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .wrapped-slide.active { opacity: 1; pointer-events: auto; }
+
+  .wrapped-eyebrow {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 auto;
+  }
+  .wrapped-slide-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .wrapped-score-num {
+    font-size: 5.2rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .wrapped-score-den { font-size: 1.3rem; font-weight: 700; opacity: 0.75; }
+  .wrapped-score-tag {
+    margin-top: 6px;
+    background: var(--accent);
+    color: #14100a;
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  .wrapped-quote-mark { font-size: 2.6rem; font-weight: 900; color: var(--accent); line-height: 0.5; }
+  .wrapped-quote {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.42;
+    margin: 0;
+  }
+
+  .wrapped-tips-title { font-size: 1.15rem; font-weight: 900; text-transform: uppercase; margin-bottom: 2px; flex-shrink: 0; }
+  .wrapped-slide-content.tips-content { overflow: hidden; }
+  .wrapped-tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+  .wrapped-tips-list li {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .wrapped-tip-num {
+    background: var(--accent);
+    color: #14100a;
+    font-weight: 900;
+    font-size: 0.8rem;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wrapped-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 14px;
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+  }
+
+  .wrapped-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 340px;
+    margin: 16px auto 0;
+  }
+  .wrapped-actions button {
+    padding: 13px 10px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: 2px solid var(--black);
+    background: #fff;
+    color: var(--black);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+  .wrapped-actions button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--black); }
+  .wrapped-actions button.primary { background: var(--yellow); }
+  .wrapped-again {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    margin: 10px auto 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .wrapped-status {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 8px;
+    min-height: 1.1em;
+  }
+
+  .wrapped-headline {
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 14px 8px 0;
+  }
+
+  .wrapped-bars { width: 100%; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+  .wrapped-bar-row { display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 5px; }
+  .wrapped-bar-row b { color: var(--accent); }
+  .wrapped-bar-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.18); overflow: hidden; }
+  .wrapped-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+
+  .wrapped-rewrite { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 10px; }
+  .wrapped-rewrite-label {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .wrapped-before, .wrapped-after {
+    border-radius: 10px;
+    padding: 11px 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  .wrapped-before { background: rgba(0,0,0,0.3); text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.45); opacity: 0.8; }
+  .wrapped-after { background: var(--accent); color: #14100a; font-weight: 800; }
+  .wrapped-arrow { text-align: center; font-size: 1.2rem; color: var(--accent); line-height: 1; }
+
+  .disclaimer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    max-width: 380px;
+    margin: 12px auto 0;
+    line-height: 1.45;
+  }
+
+  /* Full report */
+  #report { margin-top: 34px; }
+  .report-card {
+    background: #fff;
+    border: 2px solid var(--black);
+    box-shadow: 3px 3px 0 var(--black);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .report-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .report-card-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; }
+  .report-score { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-weight: 800; font-size: 0.9rem; white-space: nowrap; }
+  .report-meter { height: 6px; background: #e7e3d8; margin: 8px 0 10px; }
+  .report-meter span { display: block; height: 100%; background: var(--black); }
+  .report-meter span.low { background: var(--red); }
+  .report-meter span.mid { background: var(--yellow); }
+  .report-text { font-size: 0.88rem; line-height: 1.45; color: #2b2b2e; margin: 0; }
+  .report-weight { font-size: 0.72rem; color: var(--muted); font-family: "SF Mono", "Menlo", "Consolas", monospace; }
+  .report-evidence { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .report-evidence li {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.76rem;
+    background: var(--paper);
+    border-left: 3px solid var(--black);
+    padding: 6px 8px;
+    word-break: break-word;
+  }
+  .report-sub { font-weight: 900; text-transform: uppercase; font-size: 0.82rem; margin: 22px 0 10px; }
+  .report-strengths { margin: 0; padding-left: 18px; font-size: 0.88rem; line-height: 1.5; }
+  .fix-label {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 10px 0 4px;
+  }
+  .fix-before { font-size: 0.86rem; color: #6b6b70; text-decoration: line-through; margin: 0; line-height: 1.4; }
+  .fix-after-row { display: flex; gap: 8px; align-items: flex-start; }
+  .fix-after { flex: 1; font-size: 0.9rem; font-weight: 700; background: #fff7d1; padding: 8px 10px; margin: 0; line-height: 1.4; }
+  .copy-btn {
+    border: 2px solid var(--black);
+    background: #fff;
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    padding: 7px 9px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .placeholder-hint { font-size: 0.74rem; color: var(--muted); margin: 6px 0 0; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <span class="badge mono">v1.0 // CERTIFIED HAZARD</span>
+      <div class="archive-icon">🗄</div>
+    </div>
+    <h1>ROAST<br>MY<br><span class="highlight">RESUME<span class="asterisk">✱</span></span></h1>
+    <p class="subtitle">✱ side effects may include career reconsideration, mild sweating, and going viral.</p>
+  </header>
+
+  <div class="marquee">
+    <div class="marquee-track">⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp; ⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp;</div>
+  </div>
+
+  <main>
+    <div class="section-label">
+      <span class="section-num mono">01</span>
+      <h2 class="section-title">Feed the machine</h2>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tabPaste">
+        <span class="icon">✏️</span>
+        <span>Paste Text</span>
+      </div>
+      <div class="tab" id="tabUpload">
+        <span class="icon">📄</span>
+        <span>Upload PDF</span>
+      </div>
+    </div>
+
+    <textarea id="resumeText" placeholder="Paste your resume here. Every buzzword, every 'synergy', every 'passionate about'..."></textarea>
+
+    <div class="upload-zone" id="uploadZone" style="display:none; margin-top: 0;">
+      <input type="file" id="pdfInput" accept="application/pdf" />
+      <label for="pdfInput">Choose PDF</label>
+      <div class="upload-filename" id="uploadFilename">No file chosen yet.</div>
+    </div>
+
+    <div class="section-label" style="margin-top: 28px;">
+      <span class="section-num mono">02</span>
+      <h2 class="section-title">Pick your poison</h2>
+    </div>
+
+    <div class="styles" id="styles">
+      <div class="style-card active" data-level="savage">
+        <div class="style-check"></div>
+        <div class="style-body">
+          <div class="style-title-row">
+            <span class="style-name">🔥 Savage</span>
+            <span class="style-tag">// NO MERCY</span>
+          </div>
+          <div class="style-desc">Ruthless comedy club roast. Zero mercy.</div>
+        </div>
+      </div>
+
+      <div class="style-card" data-level="corporate">
+        <div class="style-check"></div>
+        <div class="style-body">
+          <div class="style-title-row">
+            <span class="style-name">💼 Corporate</span>
+            <span class="style-tag">// HR APPROVED</span>
+          </div>
+          <div class="style-desc">Passive-aggressive LinkedIn energy.</div>
+        </div>
+      </div>
+
+      <div class="style-card" data-level="constructive">
+        <div class="style-check"></div>
+        <div class="style-body">
+          <div class="style-title-row">
+            <span class="style-name">🛠️ Constructive</span>
+            <span class="style-tag">// ACTIONABLE</span>
+          </div>
+          <div class="style-desc">Real talk, real tips. Still stings a little.</div>
+        </div>
+      </div>
+
+      <div class="style-card" data-level="shakespearean">
+        <div class="style-check"></div>
+        <div class="style-body">
+          <div class="style-title-row">
+            <span class="style-name">🎭 Shakespearean</span>
+            <span class="style-tag">// THY DOOM</span>
+          </div>
+          <div class="style-desc">Bardic drama. Forsooth, thou art cooked.</div>
+        </div>
+      </div>
+    </div>
+
+    <button id="roastBtn">Ignite Roast →</button>
+    <p class="footnote" id="limitNote">// one roast per device per day. make it count.</p>
+    <p class="footnote">// your resume is reviewed by a third-party AI provider. we don't save it. only your dignity is at risk.</p>
+
+    <div id="error"></div>
+
+    <div id="resultWrap">
+      <div class="wrapped-card" id="wrappedCard">
+        <div class="wrapped-dots" id="wrappedDots"></div>
+        <div class="wrapped-tap-zones">
+          <span id="tapPrev"></span>
+          <span id="tapNext"></span>
+        </div>
+        <div class="wrapped-slides" id="wrappedSlides"></div>
+      </div>
+
+      <div class="wrapped-actions">
+        <button id="downloadBtn">⬇ Download</button>
+        <button id="shareBtn" class="primary">↗ Share</button>
+      </div>
+      <p class="wrapped-status" id="wrappedStatus"></p>
+      <button class="wrapped-again" id="roastAgainBtn">↺ Roast again</button>
+
+      <section id="report">
+        <div class="section-label">
+          <span class="section-num mono">03</span>
+          <h2 class="section-title">The full report</h2>
+        </div>
+        <div id="reportCategories"></div>
+        <h3 class="report-sub">What's working</h3>
+        <div class="report-card"><ul class="report-strengths" id="reportStrengths"></ul></div>
+        <h3 class="report-sub">Fix these first</h3>
+        <div id="reportFixes"></div>
+        <p class="disclaimer">
+          Scored against common recruiter and applicant-tracking-system (ATS) guidelines: impact, readability, clarity, consistency and skills.
+          AI-generated feedback, not professional career advice. Every quote above was checked against your resume; double-check rewrites before you apply.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window["pdfjsLib"]) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
+    const MIN_CHARS = 150;
+    const MAX_CHARS = 20000;
+
+    // Per-browser id so one device gets one roast a day. Not security: the server also limits per IP and per day.
+    function deviceId() {
+      try {
+        let id = localStorage.getItem("rmr-device-id");
+        if (!id) {
+          id = crypto.randomUUID();
+          localStorage.setItem("rmr-device-id", id);
+        }
+        return id;
+      } catch {
+        return "no-storage";
+      }
+    }
+
+    let level = "savage";
+    let mode = "paste";
+    let pdfText = "";
+
+    const resumeTextEl = document.getElementById("resumeText");
+    const uploadZone = document.getElementById("uploadZone");
+    const tabPaste = document.getElementById("tabPaste");
+    const tabUpload = document.getElementById("tabUpload");
+    const pdfInput = document.getElementById("pdfInput");
+    const uploadFilename = document.getElementById("uploadFilename");
+
+    tabPaste.addEventListener("click", () => {
+      mode = "paste";
+      tabPaste.classList.add("active");
+      tabUpload.classList.remove("active");
+      resumeTextEl.style.display = "block";
+      uploadZone.style.display = "none";
+    });
+
+    tabUpload.addEventListener("click", () => {
+      mode = "upload";
+      tabUpload.classList.add("active");
+      tabPaste.classList.remove("active");
+      resumeTextEl.style.display = "none";
+      uploadZone.style.display = "block";
+    });
+
+    pdfInput.addEventListener("change", async () => {
+      const file = pdfInput.files[0];
+      if (!file) return;
+      uploadFilename.textContent = `Reading ${file.name}...`;
+      try {
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        let text = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          let lastY = null;
+          for (const item of content.items) {
+            const y = item.transform?.[5];
+            if (lastY !== null && y !== undefined && Math.abs(y - lastY) > 2 && !text.endsWith("\n")) text += "\n";
+            text += item.str;
+            if (item.hasEOL) text += "\n";
+            else if (item.str && !item.str.endsWith(" ")) text += " ";
+            if (y !== undefined) lastY = y;
+          }
+          text += "\n";
+        }
+        pdfText = text.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+
+        if (pdfText.length < MIN_CHARS) {
+          pdfText = "";
+          uploadFilename.textContent = `Couldn't find text in ${file.name}. It may be a scanned image; paste your resume text instead.`;
+          return;
+        }
+        uploadFilename.textContent = `✓ ${file.name} (${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}, ${pdfText.length.toLocaleString()} characters)`;
+      } catch (err) {
+        pdfText = "";
+        uploadFilename.textContent = `Couldn't read that PDF: ${err.message}`;
+      }
+    });
+
+    document.querySelectorAll(".style-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        level = card.dataset.level;
+        document.querySelectorAll(".style-card").forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+      });
+    });
+
+    const roastBtn = document.getElementById("roastBtn");
+    const errorEl = document.getElementById("error");
+    const resultWrap = document.getElementById("resultWrap");
+    const wrappedCard = document.getElementById("wrappedCard");
+    const wrappedSlides = document.getElementById("wrappedSlides");
+    const wrappedDots = document.getElementById("wrappedDots");
+    const wrappedStatus = document.getElementById("wrappedStatus");
+    const limitNote = document.getElementById("limitNote");
+
+    const LEVEL_META = {
+      savage: { label: "Savage Roast", tag: "🔥 No mercy" },
+      corporate: { label: "Corporate Roast", tag: "💼 HR approved" },
+      constructive: { label: "Constructive Roast", tag: "🛠️ Actionable" },
+      shakespearean: { label: "Shakespearean Roast", tag: "🎭 Thy doom" },
+    };
+
+    let slideIndex = 0;
+
+    function goToSlide(i) {
+      const slides = wrappedSlides.querySelectorAll(".wrapped-slide");
+      const dots = wrappedDots.querySelectorAll(".wrapped-dot");
+      if (!slides.length) return;
+      slideIndex = Math.max(0, Math.min(i, slides.length - 1));
+
+      slides.forEach((s, idx) => s.classList.toggle("active", idx === slideIndex));
+      dots.forEach((d, idx) => {
+        d.classList.remove("active", "done");
+        if (idx < slideIndex) d.classList.add("done");
+        if (idx === slideIndex) d.classList.add("active");
+      });
+    }
+
+    let currentShareText = "";
+
+    function buildShareText(result) {
+      const meta = LEVEL_META[result.style] || LEVEL_META.savage;
+      const weakest = [...result.categories].sort((a, b) => a.score - b.score)[0];
+      const siteLine = window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin : "";
+      return `My resume scored ${result.score}/10 on Roast My Resume (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
+    }
+
+    function slide(eyebrow, body, index, total, extraClass = "") {
+      return `
+        <div class="wrapped-slide">
+          <p class="wrapped-eyebrow">${eyebrow}</p>
+          <div class="wrapped-slide-content ${extraClass}">${body}</div>
+          <div class="wrapped-brand"><span>🔥 ROAST MY RESUME</span><span>${index}/${total}</span></div>
+        </div>`;
+    }
+
+    function buildWrapped(result) {
+      const meta = LEVEL_META[result.style] || LEVEL_META.savage;
+      wrappedCard.dataset.theme = result.style;
+      currentShareText = buildShareText(result);
+
+      const topFix = result.fixes[0];
+      const total = topFix ? 5 : 4;
+
+      const slides = [
+        slide(
+          meta.label,
+          `<div><span class="wrapped-score-num">${result.score}</span><span class="wrapped-score-den">/10</span></div>
+           <span class="wrapped-score-tag">${meta.tag}</span>
+           <p class="wrapped-headline">${escapeHtml(result.headline)}</p>`,
+          1, total
+        ),
+        slide(
+          "The verdict",
+          `<span class="wrapped-quote-mark">"</span>
+           <p class="wrapped-quote">${escapeHtml(result.roast)}</p>`,
+          2, total
+        ),
+        slide(
+          "The breakdown",
+          `<div class="wrapped-bars">
+             ${result.categories.map((c) => `
+               <div>
+                 <div class="wrapped-bar-row"><span>${escapeHtml(c.label)}</span><b>${c.score}/10</b></div>
+                 <div class="wrapped-bar-track"><div class="wrapped-bar-fill" style="width:${c.score * 10}%"></div></div>
+               </div>`).join("")}
+           </div>`,
+          3, total
+        ),
+      ];
+
+      if (topFix) {
+        slides.push(
+          slide(
+            "The glow-up",
+            `<div class="wrapped-rewrite">
+               <span class="wrapped-rewrite-label">${escapeHtml(topFix.label)} // before</span>
+               <div class="wrapped-before">${escapeHtml(truncate(topFix.before, 150))}</div>
+               <div class="wrapped-arrow">↓</div>
+               <span class="wrapped-rewrite-label">after</span>
+               <div class="wrapped-after">${escapeHtml(truncate(topFix.after, 170))}</div>
+             </div>`,
+            4, total
+          )
+        );
+      }
+
+      slides.push(
+        slide(
+          "Your to-do list",
+          `<p class="wrapped-tips-title">Fix these first</p>
+           <ul class="wrapped-tips-list">
+             ${result.fixes.map((f, i) => `<li><span class="wrapped-tip-num">${i + 1}</span><span>${escapeHtml(f.problem)}</span></li>`).join("")}
+           </ul>`,
+          total, total, "tips-content"
+        )
+      );
+
+      wrappedSlides.innerHTML = slides.join("");
+      wrappedDots.innerHTML = slides.map(() => `<div class="wrapped-dot"></div>`).join("");
+      goToSlide(0);
+    }
+
+    function meterClass(score) {
+      if (score <= 4) return "low";
+      if (score <= 6) return "mid";
+      return "";
+    }
+
+    function buildReport(result) {
+      document.getElementById("reportCategories").innerHTML = result.categories
+        .map(
+          (c) => `
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">${escapeHtml(c.label)} <span class="report-weight">${Math.round(c.weight * 100)}% of score</span></span>
+              <span class="report-score">${c.score}/10</span>
+            </div>
+            <div class="report-meter"><span class="${meterClass(c.score)}" style="width:${c.score * 10}%"></span></div>
+            <p class="report-text">${escapeHtml(c.finding)}</p>
+            ${c.evidence.length ? `<ul class="report-evidence">${c.evidence.map((q) => `<li>"${escapeHtml(q)}"</li>`).join("")}</ul>` : ""}
+          </div>`
+        )
+        .join("");
+
+      document.getElementById("reportStrengths").innerHTML = result.strengths.length
+        ? result.strengths.map((s) => `<li>${escapeHtml(s)}</li>`).join("")
+        : "<li>Keep going: every section below has a clear next step.</li>";
+
+      document.getElementById("reportFixes").innerHTML = result.fixes
+        .map(
+          (f, i) => `
+          <div class="report-card">
+            <div class="report-card-head">
+              <span class="report-card-title">${i + 1}. ${escapeHtml(f.problem)}</span>
+            </div>
+            <p class="fix-label">${escapeHtml(f.label)} // your line</p>
+            <p class="fix-before">${escapeHtml(f.before)}</p>
+            <p class="fix-label">try this</p>
+            <div class="fix-after-row">
+              <p class="fix-after">${escapeHtml(f.after)}</p>
+              <button class="copy-btn" data-copy="${i}">Copy</button>
+            </div>
+            ${/\[[^\]]+\]/.test(f.after) ? `<p class="placeholder-hint">Replace the [brackets] with your real numbers. Don't guess.</p>` : ""}
+          </div>`
+        )
+        .join("");
+
+      document.querySelectorAll("#reportFixes .copy-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(result.fixes[Number(btn.dataset.copy)].after);
+            btn.textContent = "Copied";
+          } catch {
+            btn.textContent = "Failed";
+          }
+          setTimeout(() => (btn.textContent = "Copy"), 1500);
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function truncate(str, max) {
+      if (str.length <= max) return str;
+      return str.slice(0, max).trim() + "…";
+    }
+
+    document.getElementById("tapNext").addEventListener("click", () => goToSlide(slideIndex + 1));
+    document.getElementById("tapPrev").addEventListener("click", () => goToSlide(slideIndex - 1));
+
+    document.getElementById("roastAgainBtn").addEventListener("click", () => {
+      resultWrap.style.display = "none";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", async () => {
+      wrappedStatus.textContent = "Rendering image...";
+      try {
+        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
+        const link = document.createElement("a");
+        link.download = "roast-my-resume.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        wrappedStatus.textContent = "Saved! Now go post it.";
+      } catch (err) {
+        wrappedStatus.textContent = "Couldn't render image: " + err.message;
+      }
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      wrappedStatus.textContent = "Preparing share...";
+      try {
+        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        const file = new File([blob], "roast-my-resume.png", { type: "image/png" });
+        const shareText = currentShareText || "My resume just got roasted 🔥";
+        const sharePayload = { files: [file], title: "Roast My Resume", text: shareText };
+
+        if (navigator.canShare && navigator.canShare(sharePayload)) {
+          // Image + copywriting together, in one native share sheet.
+          await navigator.share(sharePayload);
+          wrappedStatus.textContent = "Shared!";
+        } else if (navigator.share) {
+          // Device can't attach the file to a share sheet — still send the copywriting,
+          // and hand over the image separately so nothing is lost.
+          const link = document.createElement("a");
+          link.download = "roast-my-resume.png";
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+          await navigator.share({ title: "Roast My Resume", text: shareText });
+          wrappedStatus.textContent = "Image downloaded, caption shared!";
+        } else {
+          // No native share sheet (most desktop browsers) — download the image and
+          // copy the caption so the user can paste both into whatever they're using.
+          const link = document.createElement("a");
+          link.download = "roast-my-resume.png";
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+          try {
+            await navigator.clipboard.writeText(shareText);
+            wrappedStatus.textContent = "Image downloaded + caption copied to clipboard!";
+          } catch {
+            wrappedStatus.textContent = "Image downloaded. Caption: " + shareText;
+          }
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          wrappedStatus.textContent = "Couldn't share: " + err.message;
+        } else {
+          wrappedStatus.textContent = "";
+        }
+      }
+    });
+
+    roastBtn.addEventListener("click", async () => {
+      const resumeText = mode === "upload" ? pdfText : resumeTextEl.value;
+      errorEl.style.display = "none";
+      resultWrap.style.display = "none";
+      wrappedStatus.textContent = "";
+
+      const showError = (msg) => {
+        errorEl.textContent = msg;
+        errorEl.style.display = "block";
+      };
+
+      if (!resumeText || !resumeText.trim()) {
+        return showError(mode === "upload" ? "Upload a PDF first." : "Paste your resume first.");
+      }
+      if (resumeText.trim().length < MIN_CHARS) {
+        return showError("That's too short to review. Paste your full resume.");
+      }
+      if (resumeText.length > MAX_CHARS) {
+        return showError(`That's over ${MAX_CHARS.toLocaleString()} characters. Trim it to your resume only.`);
+      }
+
+      roastBtn.disabled = true;
+      roastBtn.textContent = "Reviewing + roasting (~10s)...";
+
+      try {
+        const res = await fetch("/api/roast", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Device-Id": deviceId() },
+          body: JSON.stringify({ resumeText, style: level }),
+        });
+        const data = await res.json();
+
+        // Shown once, in the limit note under the button.
+        if (res.status === 429) {
+          limitNote.textContent = `🔒 ${data.error}`;
+          limitNote.style.color = "var(--red)";
+          limitNote.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || "Something went wrong.");
+
+        if (typeof data.remainingToday === "number") {
+          limitNote.textContent = data.remainingToday > 0
+            ? `// ${data.remainingToday} roast${data.remainingToday === 1 ? "" : "s"} left today.`
+            : "// that was today's roast. come back tomorrow for another.";
+        }
+
+        buildWrapped(data);
+        buildReport(data);
+
+        resultWrap.style.display = "block";
+        resultWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.style.display = "block";
+      } finally {
+        roastBtn.disabled = false;
+        roastBtn.textContent = "Ignite Roast →";
+      }
+    });
+  </script>
+</body>
+</html>
