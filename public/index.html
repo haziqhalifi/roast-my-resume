@@ -275,17 +275,45 @@
   #roastBtn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--black); }
   #roastBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  /* Loading panel */
+  /* Loading overlay: takes over the whole viewport while the AI works */
   #loadingPanel {
     display: none;
-    margin-top: 18px;
-    padding: 16px;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
     background: var(--black);
-    border: 2px solid var(--black);
-    box-shadow: 4px 4px 0 var(--red);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  #loadingPanel.active { display: flex; }
+  .loading-badge {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    padding: 6px 10px;
+    border: 2px solid var(--yellow);
+    margin-bottom: 22px;
+  }
+  .loading-emoji {
+    font-size: 2.6rem;
+    margin-bottom: 18px;
+    animation: loading-bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes loading-bounce {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-10px) rotate(4deg); }
   }
   .loading-bar-track {
-    height: 10px;
+    width: 100%;
+    max-width: 320px;
+    height: 12px;
     background: #2a2a2e;
     border: 1px solid #3f3f46;
     overflow: hidden;
@@ -306,12 +334,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 12px;
-    min-height: 1.3em;
+    margin-top: 20px;
+    min-height: 1.5em;
   }
   .loading-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: var(--yellow);
     flex-shrink: 0;
@@ -323,16 +351,17 @@
   }
   .loading-text {
     font-family: "SF Mono", "Menlo", "Consolas", monospace;
-    font-size: 0.85rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--yellow);
     letter-spacing: 0.01em;
   }
   .loading-substep {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     color: #a1a1aa;
-    margin-top: 6px;
+    margin-top: 14px;
     font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    max-width: 320px;
   }
 
   .footnote {
@@ -749,7 +778,9 @@
 
     <button id="roastBtn">Ignite Roast →</button>
 
-    <div id="loadingPanel">
+    <div id="loadingPanel" role="status" aria-live="polite">
+      <span class="loading-badge mono">v1.0 // CERTIFIED HAZARD</span>
+      <div class="loading-emoji">🔥</div>
       <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
       <div class="loading-status">
         <span class="loading-dot"></span>
@@ -1171,7 +1202,8 @@
       const startedAt = Date.now();
       let stepIndex = 0;
       let substepIndex = 0;
-      loadingPanel.style.display = "block";
+      loadingPanel.classList.add("active");
+      document.body.style.overflow = "hidden";
       loadingBarFill.style.width = "0%";
       loadingText.textContent = LOADING_STEPS[0];
       loadingSubstep.textContent = LOADING_SUBSTEPS[0];
@@ -1197,12 +1229,16 @@
     function stopLoading(success) {
       clearInterval(loadingTimer);
       loadingTimer = null;
+      const hide = () => {
+        loadingPanel.classList.remove("active");
+        document.body.style.overflow = "";
+      };
       if (success) {
         loadingBarFill.style.width = "100%";
         loadingText.textContent = "✅ Done!";
-        setTimeout(() => { loadingPanel.style.display = "none"; }, 500);
+        setTimeout(hide, 500);
       } else {
-        loadingPanel.style.display = "none";
+        hide();
       }
     }
 
