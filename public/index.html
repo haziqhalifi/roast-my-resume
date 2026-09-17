@@ -429,7 +429,7 @@
     border-radius: 20px;
     overflow: hidden;
     background: var(--wrapped-bg, linear-gradient(165deg, #1a0402 0%, #3a0d05 45%, #e8401e 130%));
-    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 0 120px rgba(0,0,0,0.35);
     user-select: none;
     -webkit-user-select: none;
     transition: max-width 0.4s ease, border-radius 0.4s ease;
@@ -513,11 +513,15 @@
   }
   .wrapped-dot {
     flex: 1;
-    height: 3px;
+    /* Padding pads the tap target to ~17px tall; background-clip keeps the visible bar a thin 3px. */
+    height: 17px;
+    padding: 7px 0;
     background: rgba(255,255,255,0.28);
+    background-clip: content-box;
     border-radius: 2px;
     overflow: hidden;
     box-shadow: 0 0 0 rgba(0,0,0,0);
+    cursor: pointer;
   }
   .wrapped-dot::after {
     content: "";
@@ -572,6 +576,28 @@
     z-index: 1;
   }
 
+  /* Tier badge — the "which one are you" hook that makes a score worth screenshotting */
+  .wrapped-tier {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.14);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    backdrop-filter: blur(6px);
+    padding: 7px 16px 7px 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    animation: tier-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .wrapped-tier-emoji { font-size: 1.05rem; }
+  @keyframes tier-pop {
+    0% { opacity: 0; transform: scale(0.5) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
   .wrapped-score-num {
     font-size: clamp(5.2rem, 16vh, 8rem);
     font-weight: 900;
@@ -579,7 +605,16 @@
     letter-spacing: -0.03em;
     text-shadow: 0 0 40px rgba(255,255,255,0.25);
   }
+  .wrapped-score-num.shake { animation: score-shake 0.5s ease 0.4s 1; }
+  @keyframes score-shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-7px) rotate(-2deg); }
+    40% { transform: translateX(6px) rotate(2deg); }
+    60% { transform: translateX(-5px) rotate(-1deg); }
+    80% { transform: translateX(3px) rotate(1deg); }
+  }
   .wrapped-score-den { font-size: 1.3rem; font-weight: 700; opacity: 0.75; }
+  .wrapped-tier-sub { font-size: 0.85rem; font-weight: 600; opacity: 0.82; margin-top: -4px; }
   .wrapped-score-tag {
     margin-top: 6px;
     background: var(--accent);
@@ -590,6 +625,21 @@
     letter-spacing: 0.03em;
     padding: 6px 14px;
     border-radius: 999px;
+  }
+
+  /* Confetti burst for top-tier scores */
+  .wrapped-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 6; }
+  .confetti-piece {
+    position: absolute;
+    top: -8%;
+    width: 8px;
+    height: 14px;
+    opacity: 0.95;
+    animation: confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(120vh) rotate(560deg); opacity: 0; }
   }
 
   .wrapped-quote-mark { font-size: 2.6rem; font-weight: 900; color: var(--accent); line-height: 0.5; }
@@ -641,12 +691,15 @@
     justify-content: space-between;
     margin-top: auto;
     padding-top: 14px;
+    position: relative;
+    z-index: 2;
     font-family: "SF Mono", "Menlo", "Consolas", monospace;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     opacity: 0.85;
   }
+  .wrapped-wordmark b { color: var(--accent); font-weight: 900; }
 
   .wrapped-actions {
     display: grid;
@@ -692,10 +745,22 @@
   }
 
   .wrapped-headline {
-    font-size: 1.05rem;
-    font-weight: 800;
-    line-height: 1.3;
-    margin: 14px 8px 0;
+    display: inline-block;
+    font-size: clamp(0.95rem, 2.4vh, 1.25rem);
+    font-weight: 900;
+    line-height: 1.28;
+    margin: 16px 6px 0;
+    padding: 10px 16px;
+    background: #fff;
+    color: #14100a;
+    border-radius: 10px;
+    transform: rotate(-2deg);
+    box-shadow: 0 6px 0 rgba(0,0,0,0.22);
+    animation: headline-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+  }
+  @keyframes headline-pop {
+    0% { opacity: 0; transform: rotate(-2deg) scale(0.85) translateY(8px); }
+    100% { opacity: 1; transform: rotate(-2deg) scale(1) translateY(0); }
   }
 
   .wrapped-bars { width: 100%; display: flex; flex-direction: column; gap: 14px; text-align: left; }
@@ -898,6 +963,7 @@
       <div class="wrapped-card" id="wrappedCard">
         <button class="story-close" id="storyClose" aria-label="Close">✕</button>
         <div class="wrapped-dots" id="wrappedDots"></div>
+        <div class="wrapped-confetti" id="wrappedConfetti"></div>
         <div class="wrapped-slides" id="wrappedSlides"></div>
       </div>
 
@@ -1037,6 +1103,19 @@
       shakespearean: { label: "Shakespearean Roast", tag: "🎭 Thy doom" },
     };
 
+    // The tier is the "which one are you" hook — score-driven, independent of roast style,
+    // so it reads consistently across all four voices and is worth screenshotting on its own.
+    const TIERS = [
+      { max: 2, emoji: "🚨", label: "Resume Emergency", sub: "Call it in. This one's critical." },
+      { max: 4, emoji: "🩹", label: "Needs Life Support", sub: "It has a pulse. Barely." },
+      { max: 6, emoji: "😐", label: "Mid But Fixable", sub: "Won't get tossed. Won't get callbacks either." },
+      { max: 8, emoji: "✨", label: "Actually Decent", sub: "A few tweaks from great." },
+      { max: Infinity, emoji: "🏆", label: "Recruiter's Dream", sub: "Certified hazard-free." },
+    ];
+    function getTier(score) {
+      return TIERS.find((t) => score <= t.max) || TIERS[TIERS.length - 1];
+    }
+
     let slideIndex = 0;
 
     function goToSlide(i) {
@@ -1057,9 +1136,25 @@
 
     function buildShareText(result) {
       const meta = LEVEL_META[result.style] || LEVEL_META.savage;
+      const tier = getTier(result.score);
       const weakest = [...result.categories].sort((a, b) => a.score - b.score)[0];
       const siteLine = window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin : "";
-      return `My resume scored ${result.score}/10 on Roast My Resume (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
+      return `${tier.emoji} ${tier.label}: my resume scored ${result.score}/10 on Roast My Resume (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
+    }
+
+    function spawnConfetti(count = 26) {
+      const el = document.getElementById("wrappedConfetti");
+      if (!el) return;
+      const colors = ["#f4c81a", "#e8401e", "#ffffff", "#8fc6ff", "#24d68f"];
+      const pieces = Array.from({ length: count }, (_, i) => {
+        const left = Math.random() * 100;
+        const bg = colors[i % colors.length];
+        const delay = (Math.random() * 0.6).toFixed(2);
+        const duration = (2.2 + Math.random() * 1.2).toFixed(2);
+        const rotate = Math.floor(Math.random() * 360);
+        return `<span class="confetti-piece" style="left:${left}%;background:${bg};animation-delay:${delay}s;animation-duration:${duration}s;transform:rotate(${rotate}deg)"></span>`;
+      });
+      el.innerHTML = pieces.join("");
     }
 
     function slide(eyebrow, body, index, total, extraClass = "") {
@@ -1067,22 +1162,30 @@
         <div class="wrapped-slide">
           <p class="wrapped-eyebrow">${eyebrow}</p>
           <div class="wrapped-slide-content ${extraClass}">${body}</div>
-          <div class="wrapped-brand"><span>🔥 ROAST MY RESUME</span><span>${index}/${total}</span></div>
+          <div class="wrapped-brand">
+            <span class="wrapped-wordmark">🔥 roastmyresume<b>.app</b></span>
+            <span>${index}/${total}</span>
+          </div>
         </div>`;
     }
 
     function buildWrapped(result) {
       const meta = LEVEL_META[result.style] || LEVEL_META.savage;
+      const tier = getTier(result.score);
       wrappedCard.dataset.theme = result.style;
       currentShareText = buildShareText(result);
 
       const topFix = result.fixes[0];
       const total = topFix ? 5 : 4;
+      const isBottomTier = tier === TIERS[0];
+      const isTopTier = tier === TIERS[TIERS.length - 1];
 
       const slides = [
         slide(
           meta.label,
-          `<div><span class="wrapped-score-num">${result.score}</span><span class="wrapped-score-den">/10</span></div>
+          `<span class="wrapped-tier"><span class="wrapped-tier-emoji">${tier.emoji}</span>${escapeHtml(tier.label)}</span>
+           <div><span class="wrapped-score-num${isBottomTier ? " shake" : ""}">${result.score}</span><span class="wrapped-score-den">/10</span></div>
+           <p class="wrapped-tier-sub">${escapeHtml(tier.sub)}</p>
            <span class="wrapped-score-tag">${meta.tag}</span>
            <p class="wrapped-headline">${escapeHtml(result.headline)}</p>`,
           1, total
@@ -1135,7 +1238,9 @@
       );
 
       wrappedSlides.innerHTML = slides.join("");
-      wrappedDots.innerHTML = slides.map(() => `<div class="wrapped-dot"></div>`).join("");
+      wrappedDots.innerHTML = slides.map((_, i) => `<div class="wrapped-dot" data-index="${i}"></div>`).join("");
+      document.getElementById("wrappedConfetti").innerHTML = "";
+      if (isTopTier) spawnConfetti();
       goToSlide(0);
     }
 
@@ -1240,6 +1345,8 @@
       if (didSwipe) { didSwipe = false; return; }
       if (e.target.closest(".story-close")) return;
       if (e.target.closest("#storyContinue")) { exitStoryMode(); return; }
+      const dot = e.target.closest(".wrapped-dot");
+      if (dot) { goToSlide(Number(dot.dataset.index)); return; }
       const rect = wrappedCard.getBoundingClientRect();
       const isRightHalf = e.clientX - rect.left > rect.width / 2;
       goToSlide(slideIndex + (isRightHalf ? 1 : -1));
