@@ -1,9 +1,11 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { Redis } from "@upstash/redis";
 import { roastResume, PipelineError } from "./lib/pipeline.js";
 import { STYLES, MIN_RESUME_CHARS, MAX_RESUME_CHARS } from "./lib/rubric.js";
 import { UsageStore } from "./lib/usage.js";
+import { RedisUsageStore, UsageLimitError } from "./lib/usage-redis.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -13,17 +15,25 @@ const ROAST_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 const EVAL_MODEL = process.env.OPENROUTER_EVAL_MODEL || ROAST_MODEL;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-// Vercel functions have no persistent disk; /tmp survives only within a warm container, so this
-// limiter is best-effort there (counts can reset between cold starts). Fine for now — see README.
-const defaultUsageFile = process.env.VERCEL ? "/tmp/usage.json" : path.join(__dirname, "data", "usage.json");
-
-const usage = new UsageStore({
-  file: process.env.USAGE_FILE || defaultUsageFile,
+const usageLimits = {
   perDevicePerDay: Number(process.env.ROASTS_PER_DEVICE_PER_DAY ?? 1),
   perIpPerDay: Number(process.env.ROASTS_PER_IP_PER_DAY ?? 5),
   globalPerDay: Number(process.env.ROASTS_PER_DAY ?? 200),
   salt: process.env.USAGE_SALT || OPENROUTER_API_KEY || "roast-my-resume",
-});
+};
+
+// Redis (Upstash, via the Vercel KV integration) when configured — required on Vercel, since
+// serverless functions have no persistent disk. Falls back to a local JSON file otherwise.
+const usage =
+  process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+    ? new RedisUsageStore({
+        redis: new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN }),
+        ...usageLimits,
+      })
+    : new UsageStore({
+        file: process.env.USAGE_FILE || path.join(__dirname, "data", "usage.json"),
+        ...usageLimits,
+      });
 
 app.set("trust proxy", true);
 app.use(express.json({ limit: "200kb" }));
@@ -53,7 +63,13 @@ app.post("/api/roast", async (req, res) => {
   }
 
   // Claim the slot before spending any tokens.
-  const slot = usage.consume(deviceId, req.ip, style);
+  let slot;
+  try {
+    slot = await usage.consume(deviceId, req.ip, style);
+  } catch (err) {
+    const status = err instanceof UsageLimitError ? err.status : 500;
+    return res.status(status).json({ error: err.message });
+  }
   if (!slot.allowed) {
     res.set("X-RateLimit-Remaining", "0");
     return res.status(429).json({ error: LIMIT_MESSAGES[slot.reason], resetAt: slot.resetAt, reason: slot.reason });
@@ -66,26 +82,26 @@ app.post("/api/roast", async (req, res) => {
       roastModel: ROAST_MODEL,
       resumeText: resumeText.trim(),
       style,
-      onUsage: (tokens) => usage.recordTokens(tokens),
+      onUsage: (tokens) => usage.recordTokens(tokens, slot.day),
     });
     res.set("X-RateLimit-Remaining", String(slot.remaining));
     res.json({ ...result, remainingToday: slot.remaining, resetAt: slot.resetAt });
   } catch (err) {
     const status = err instanceof PipelineError ? err.status : 500;
     // Infrastructure failures shouldn't burn the user's one roast; a rejected non-resume still costs a call.
-    if (status >= 500) usage.refund(slot.device, slot.ipHash, style);
+    if (status >= 500) await usage.refund(slot.device, slot.ipHash, style, slot.day);
     const message = err.name === "TimeoutError" ? "The AI took too long. Try again." : err.message;
     res.status(status).json({ error: message });
   }
 });
 
-app.get("/api/stats", (req, res) => {
+app.get("/api/stats", async (req, res) => {
   const token = req.get("x-admin-token") || req.query.token;
   const isLocal = ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(req.ip);
   if (ADMIN_TOKEN ? token !== ADMIN_TOKEN : !isLocal) {
     return res.status(403).json({ error: "Forbidden." });
   }
-  res.json(usage.stats());
+  res.json(await usage.stats());
 });
 
 // Vercel imports this module as a serverless function handler and never runs this directly.
