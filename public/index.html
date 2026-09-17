@@ -275,6 +275,66 @@
   #roastBtn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--black); }
   #roastBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+  /* Loading panel */
+  #loadingPanel {
+    display: none;
+    margin-top: 18px;
+    padding: 16px;
+    background: var(--black);
+    border: 2px solid var(--black);
+    box-shadow: 4px 4px 0 var(--red);
+  }
+  .loading-bar-track {
+    height: 10px;
+    background: #2a2a2e;
+    border: 1px solid #3f3f46;
+    overflow: hidden;
+  }
+  .loading-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--red), var(--yellow));
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.4s linear infinite;
+    transition: width 0.4s ease;
+  }
+  @keyframes loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .loading-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    min-height: 1.3em;
+  }
+  .loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--yellow);
+    flex-shrink: 0;
+    animation: loading-pulse 1s ease-in-out infinite;
+  }
+  @keyframes loading-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  .loading-text {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 0.01em;
+  }
+  .loading-substep {
+    font-size: 0.72rem;
+    color: #a1a1aa;
+    margin-top: 6px;
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  }
+
   .footnote {
     text-align: center;
     font-size: 0.75rem;
@@ -688,6 +748,16 @@
     </div>
 
     <button id="roastBtn">Ignite Roast →</button>
+
+    <div id="loadingPanel">
+      <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+      <div class="loading-status">
+        <span class="loading-dot"></span>
+        <span class="loading-text" id="loadingText">Reading your resume...</span>
+      </div>
+      <p class="loading-substep" id="loadingSubstep">// this can take up to 30 seconds. don't close the tab.</p>
+    </div>
+
     <p class="footnote" id="limitNote">// one roast per device per day. make it count.</p>
     <p class="footnote">// your resume is reviewed by a third-party AI provider. we don't save it. only your dignity is at risk.</p>
 
@@ -1076,6 +1146,66 @@
       }
     });
 
+    const loadingPanel = document.getElementById("loadingPanel");
+    const loadingBarFill = document.getElementById("loadingBarFill");
+    const loadingText = document.getElementById("loadingText");
+    const loadingSubstep = document.getElementById("loadingSubstep");
+
+    const LOADING_STEPS = [
+      "📄 Reading your resume...",
+      "🔍 Analyzing against recruiter standards...",
+      "🧮 Scoring impact, clarity, ATS fit...",
+      "🔥 Cooking up the roast...",
+      "✍️ Writing the verdict...",
+      "📦 Plating your results...",
+    ];
+    const LOADING_SUBSTEPS = [
+      "// this can take up to 30 seconds. don't close the tab.",
+      "// two AI passes run here: one scores you, one roasts you.",
+      "// almost there, brace yourself.",
+    ];
+
+    let loadingTimer = null;
+
+    function startLoading() {
+      const startedAt = Date.now();
+      let stepIndex = 0;
+      let substepIndex = 0;
+      loadingPanel.style.display = "block";
+      loadingBarFill.style.width = "0%";
+      loadingText.textContent = LOADING_STEPS[0];
+      loadingSubstep.textContent = LOADING_SUBSTEPS[0];
+
+      loadingTimer = setInterval(() => {
+        const elapsed = Date.now() - startedAt;
+        // Linear toward ~92% over ~24s, then holds so it never looks finished before it is.
+        loadingBarFill.style.width = Math.min(92, (elapsed / 24000) * 92) + "%";
+
+        const nextStep = Math.min(LOADING_STEPS.length - 1, Math.floor(elapsed / 2600));
+        if (nextStep !== stepIndex) {
+          stepIndex = nextStep;
+          loadingText.textContent = LOADING_STEPS[stepIndex];
+        }
+        const nextSubstep = Math.min(LOADING_SUBSTEPS.length - 1, Math.floor(elapsed / 9000));
+        if (nextSubstep !== substepIndex) {
+          substepIndex = nextSubstep;
+          loadingSubstep.textContent = LOADING_SUBSTEPS[substepIndex];
+        }
+      }, 250);
+    }
+
+    function stopLoading(success) {
+      clearInterval(loadingTimer);
+      loadingTimer = null;
+      if (success) {
+        loadingBarFill.style.width = "100%";
+        loadingText.textContent = "✅ Done!";
+        setTimeout(() => { loadingPanel.style.display = "none"; }, 500);
+      } else {
+        loadingPanel.style.display = "none";
+      }
+    }
+
     roastBtn.addEventListener("click", async () => {
       const resumeText = mode === "upload" ? pdfText : resumeTextEl.value;
       errorEl.style.display = "none";
@@ -1098,7 +1228,8 @@
       }
 
       roastBtn.disabled = true;
-      roastBtn.textContent = "Reviewing + roasting (~10s)...";
+      roastBtn.textContent = "Roasting...";
+      startLoading();
 
       try {
         const res = await fetch("/api/roast", {
@@ -1110,6 +1241,7 @@
 
         // Shown once, in the limit note under the button.
         if (res.status === 429) {
+          stopLoading(false);
           limitNote.textContent = `🔒 ${data.error}`;
           limitNote.style.color = "var(--red)";
           limitNote.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1123,12 +1255,14 @@
             : "// that was today's roast. come back tomorrow for another.";
         }
 
+        stopLoading(true);
         buildWrapped(data);
         buildReport(data);
 
         resultWrap.style.display = "block";
         resultWrap.scrollIntoView({ behavior: "smooth", block: "start" });
       } catch (err) {
+        stopLoading(false);
         errorEl.textContent = err.message;
         errorEl.style.display = "block";
       } finally {
