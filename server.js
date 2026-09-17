@@ -13,8 +13,12 @@ const ROAST_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 const EVAL_MODEL = process.env.OPENROUTER_EVAL_MODEL || ROAST_MODEL;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
+// Vercel functions have no persistent disk; /tmp survives only within a warm container, so this
+// limiter is best-effort there (counts can reset between cold starts). Fine for now — see README.
+const defaultUsageFile = process.env.VERCEL ? "/tmp/usage.json" : path.join(__dirname, "data", "usage.json");
+
 const usage = new UsageStore({
-  file: process.env.USAGE_FILE || path.join(__dirname, "data", "usage.json"),
+  file: process.env.USAGE_FILE || defaultUsageFile,
   perDevicePerDay: Number(process.env.ROASTS_PER_DEVICE_PER_DAY ?? 1),
   perIpPerDay: Number(process.env.ROASTS_PER_IP_PER_DAY ?? 5),
   globalPerDay: Number(process.env.ROASTS_PER_DAY ?? 200),
@@ -84,8 +88,14 @@ app.get("/api/stats", (req, res) => {
   res.json(usage.stats());
 });
 
-app.listen(PORT, () => {
-  console.log(`Roast My Resume running at http://localhost:${PORT}`);
-  console.log(`Scoring: ${EVAL_MODEL} | Roasting: ${ROAST_MODEL}`);
-  console.log(`Limits: ${usage.limits.perDevicePerDay}/device/day, ${usage.limits.perIpPerDay}/IP/day, ${usage.limits.globalPerDay}/day total`);
-});
+// Vercel imports this module as a serverless function handler and never runs this directly.
+const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  app.listen(PORT, () => {
+    console.log(`Roast My Resume running at http://localhost:${PORT}`);
+    console.log(`Scoring: ${EVAL_MODEL} | Roasting: ${ROAST_MODEL}`);
+    console.log(`Limits: ${usage.limits.perDevicePerDay}/device/day, ${usage.limits.perIpPerDay}/IP/day, ${usage.limits.globalPerDay}/day total`);
+  });
+}
+
+export default app;
