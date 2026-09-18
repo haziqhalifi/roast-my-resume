@@ -699,7 +699,14 @@
     letter-spacing: 0.02em;
     opacity: 0.85;
   }
+  .wrapped-wordmark {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
   .wrapped-wordmark b { color: var(--accent); font-weight: 900; }
+  .wrapped-brand span:last-child { flex-shrink: 0; margin-left: 8px; }
 
   .wrapped-actions {
     display: grid;
@@ -1157,13 +1164,17 @@
       el.innerHTML = pieces.join("");
     }
 
+    // Read once from the page's own URL, so the footer always names wherever this is actually
+    // hosted (matches the share-link logic below) instead of a hardcoded domain going stale.
+    const SITE_HOST = window.location.host || "roast-my-resume-livid.vercel.app";
+
     function slide(eyebrow, body, index, total, extraClass = "") {
       return `
         <div class="wrapped-slide">
           <p class="wrapped-eyebrow">${eyebrow}</p>
           <div class="wrapped-slide-content ${extraClass}">${body}</div>
           <div class="wrapped-brand">
-            <span class="wrapped-wordmark">🔥 roastmyresume<b>.app</b></span>
+            <span class="wrapped-wordmark">🔥 <b>${escapeHtml(SITE_HOST)}</b></span>
             <span>${index}/${total}</span>
           </div>
         </div>`;
