@@ -148,3 +148,40 @@ test("a redis failure fails closed with a UsageLimitError", async () => {
 test("dayKey is the UTC date", () => {
   assert.equal(dayKey(new Date("2026-03-05T23:59:59Z")), "2026-03-05");
 });
+
+test("view counts are separate from roasts and never blocked by rate limits", async () => {
+  const { s } = store({ perDevicePerDay: 1, globalPerDay: 1 });
+  await s.consume("d1", "1.1.1.1", "savage");
+  await s.incrementViews();
+  await s.incrementViews();
+  await s.incrementViews();
+  const stats = await s.stats();
+  assert.equal(stats.lifetimeViews, 3);
+  assert.equal(stats.lifetimeRoasts, 1);
+});
+
+test("lifetime roasts and views are namespaced by env, same as the daily counters", async () => {
+  const redis = new FakeRedis();
+  const prod = new RedisUsageStore({ redis, env: "production", now: () => new Date("2026-03-05T10:00:00Z") });
+  const local = new RedisUsageStore({ redis, env: "local", now: () => new Date("2026-03-05T10:00:00Z") });
+
+  await prod.consume("device-a", "1.1.1.1", "savage");
+  await prod.incrementViews();
+  await local.consume("device-b", "2.2.2.2", "savage");
+  await local.incrementViews();
+  await local.incrementViews();
+
+  assert.equal((await prod.stats()).lifetimeRoasts, 1);
+  assert.equal((await prod.stats()).lifetimeViews, 1);
+  assert.equal((await local.stats()).lifetimeRoasts, 1);
+  assert.equal((await local.stats()).lifetimeViews, 2);
+});
+
+test("a view-tracking failure never throws", async () => {
+  const redis = new FakeRedis();
+  redis.incr = async () => {
+    throw new Error("connection refused");
+  };
+  const s = new RedisUsageStore({ redis, env: "test", now: () => new Date("2026-03-05T10:00:00Z") });
+  await assert.doesNotReject(() => s.incrementViews());
+});

@@ -117,6 +117,34 @@
     100% { transform: translateX(-100%); }
   }
 
+  /* Social-proof strip */
+  .stats-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--black);
+    padding: 14px 10px;
+    border-bottom: 2px solid var(--yellow);
+  }
+  .stats-strip.hide { display: none; }
+  .stat-block { display: flex; flex-direction: column; align-items: center; padding: 0 18px; }
+  .stat-num {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--yellow);
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.66rem;
+    color: #b7b7bb;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 5px;
+    text-align: center;
+  }
+  .stat-divider { width: 2px; height: 30px; background: #3a3a3e; }
+
   /* Sections */
   main { padding: 26px 20px 0; }
 
@@ -913,6 +941,18 @@
     <div class="marquee-track">⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp; ⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp;</div>
   </div>
 
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat-block">
+      <span class="stat-num" id="statRoasts">—</span>
+      <span class="stat-label">resumes roasted</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-num" id="statViews">—</span>
+      <span class="stat-label">people have visited</span>
+    </div>
+  </div>
+
   <main>
     <div class="revisit-banner" id="revisitBanner">
       <div class="revisit-info">
@@ -1061,6 +1101,27 @@
     if (window["pdfjsLib"]) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
+
+    // Social-proof strip: fire a page-view beacon (cheap, no model call, not rate-limited)
+    // and pull the running totals. Hide the strip entirely rather than show a broken "—".
+    (function () {
+      try {
+        if (navigator.sendBeacon) navigator.sendBeacon("/api/view");
+        else fetch("/api/view", { method: "POST", keepalive: true }).catch(() => {});
+      } catch {
+        // A missed view tick is cosmetic only.
+      }
+
+      fetch("/api/public-stats")
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data) => {
+          document.getElementById("statRoasts").textContent = (data.totalRoasts ?? 0).toLocaleString();
+          document.getElementById("statViews").textContent = (data.totalViews ?? 0).toLocaleString();
+        })
+        .catch(() => {
+          document.getElementById("statsStrip")?.classList.add("hide");
+        });
+    })();
 
     const MIN_CHARS = 150;
     const MAX_CHARS = 20000;

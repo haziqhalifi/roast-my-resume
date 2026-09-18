@@ -104,6 +104,20 @@ app.get("/api/stats", async (req, res) => {
   res.json(await usage.stats());
 });
 
+// Public, read-only social-proof numbers for the homepage strip. No auth — these two counts
+// are meant to be seen by every visitor, unlike the rest of /api/stats.
+app.get("/api/public-stats", async (req, res) => {
+  const stats = await usage.stats();
+  res.json({ totalRoasts: stats.lifetimeRoasts, totalViews: stats.lifetimeViews });
+});
+
+// Fire-and-forget page-view beacon from the homepage. No cost (no model call), so it isn't
+// behind the roast rate limiter — a refresh just bumps a cosmetic counter.
+app.post("/api/view", async (req, res) => {
+  await usage.incrementViews();
+  res.status(204).end();
+});
+
 // Vercel imports this module as a serverless function handler and never runs this directly.
 const isMain = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {

@@ -101,3 +101,38 @@ test("tracks tokens and styles for cost visibility", () => {
 test("dayKey is the UTC date", () => {
   assert.equal(dayKey(new Date("2026-03-05T23:59:59Z")), "2026-03-05");
 });
+
+test("view counts are separate from roasts and never blocked by rate limits", () => {
+  const { s } = store({ perDevicePerDay: 1, globalPerDay: 1 });
+  s.consume("d1", "1.1.1.1", "savage");
+  s.incrementViews();
+  s.incrementViews();
+  s.incrementViews();
+  const stats = s.stats();
+  assert.equal(stats.lifetimeViews, 3);
+  assert.equal(stats.lifetimeRoasts, 1);
+});
+
+test("views survive a restart alongside roasts", () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "rmr-")), "usage.json");
+  const now = () => new Date("2026-03-05T10:00:00Z");
+  const first = new UsageStore({ file, now });
+  first.incrementViews();
+  first.incrementViews();
+
+  const reopened = new UsageStore({ file, now });
+  assert.equal(reopened.stats().lifetimeViews, 2);
+});
+
+test("loading an older data file without a views field defaults to zero", () => {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "rmr-")), "usage.json");
+  fs.writeFileSync(
+    file,
+    JSON.stringify({ current: { day: "2026-03-05", roasts: 0, devices: {}, ips: {}, styles: {}, tokens: { prompt: 0, completion: 0 } }, history: [], lifetime: { roasts: 5 } })
+  );
+  const s = new UsageStore({ file, now: () => new Date("2026-03-05T10:00:00Z") });
+  assert.equal(s.stats().lifetimeViews, 0);
+  assert.equal(s.stats().lifetimeRoasts, 5);
+  s.incrementViews();
+  assert.equal(s.stats().lifetimeViews, 1);
+});

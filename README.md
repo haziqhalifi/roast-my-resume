@@ -33,6 +33,8 @@ The device id is a random UUID the browser keeps in `localStorage` and sends as 
 
 `GET /api/stats` returns today's roasts, unique devices, style breakdown, token totals, and up to 30 days of history. It's open from localhost; set `ADMIN_TOKEN` and pass `x-admin-token` (or `?token=`) to read it from anywhere else.
 
+`GET /api/public-stats` is a small, unauthenticated subset of the above — just `{ totalRoasts, totalViews }` — for the social-proof strip on the homepage. `POST /api/view` bumps the view counter; the homepage fires it once per page load via `navigator.sendBeacon`. Neither costs a model call, so neither is behind the daily rate limiter.
+
 **Storage:** when `KV_REST_API_URL`/`KV_REST_API_TOKEN` are set, counters live in Redis ([lib/usage-redis.js](lib/usage-redis.js)) — required on Vercel, since serverless functions have no persistent disk and a local-file counter can't be shared across instances or survive cold starts. Without those vars, it falls back to a local JSON file ([lib/usage.js](lib/usage.js)) for simple local dev. Both back ends store device ids and IPs only as salted SHA-256 hashes, never raw, and resume text is never written to either. Redis keys are namespaced by `VERCEL_ENV` (`production`/`preview`/`local`) so local testing and preview deploys can't pollute production counts, and are set to fail closed (reject the request) if Redis itself is unreachable, since protecting the API budget matters more than uptime here.
 
 To provision Redis on a new project: `vercel integration add upstash/upstash-kv` (needs one-time terms acceptance in the browser), then `vercel env pull` to get the credentials locally.
