@@ -40,11 +40,13 @@ The resume is wrapped in tags and treated as untrusted data, so text like "ignor
 
    The goal steers the fixes and skills. The model also flags when the site doesn't look like the chosen type.
 3. **Validate** ([lib/website-validate.js](lib/website-validate.js)): evidence and "before" lines must be verbatim from the site text. A fix can also be an *addition* (empty "before") for something missing, like a CTA. Rewrites can't invent numbers or use marketing filler. Only the text, links and image count are shown to the model, and it is told it can't see visual design or speed and must not judge them.
-4. **Roast + resources** (in parallel): the roast is written from the validated findings. The model names 3 skills and describes the ideal guide for each; Exa `/search` turns those descriptions into real links, plus example sites for the type and goal. The model never writes a URL.
+4. **Roast + skills + examples** (in parallel): the roast is written from the validated findings. The model picks 3 skills by id from a fixed catalog ([lib/skills-catalog.js](lib/skills-catalog.js)) and says why each fits; the server attaches that skill's free guides and installable AI agent skills (e.g. `npx skills add anthropics/skills --skill frontend-design`). Only example sites are a live Exa `/search`, for the type and goal. The model never writes a URL or install command.
 
 Website roasts have their own usage counters (Redis namespace `usage-web`, or `data/usage-web.json` locally), so they don't use up a resume roast. `/api/public-stats`, `/api/view` and `/api/stats` take `?app=website` for the website counters.
 
-Limitations: only the text is judged, not layout, images or speed. Pages that render their text entirely with JavaScript may not be readable. Learning links and example sites come from search and aren't hand-vetted.
+Limitations: only the text is judged, not layout, images or speed. Pages that render their text entirely with JavaScript may not be readable. Example sites come from live search and aren't hand-vetted.
+
+**Skills catalog:** 15 skills across UX, visual design, copy, conversion, trust, SEO, content, email, pricing, product pages and customer research, each with 1-2 free guides and 1-2 agent skills (from `anthropics/skills`, `vercel-labs/agent-skills`, `coreyhaines31/marketingskills`, `deanpeters/Product-Manager-Skills`, `nextlevelbuilder/ui-ux-pro-max-skill`, `pbakaus/impeccable`). Each skill lists the site types it applies to, and the schema only allows those ids for the chosen type. Researched with Exa in September 2026; links and skill names were checked then, so re-check when editing.
 
 ## Usage limits and tracking
 

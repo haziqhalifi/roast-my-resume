@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { normalizeSiteUrl, siteCorpus, validateSiteEvaluation } from "../lib/website-validate.js";
 import { SITE_TYPES, siteEvaluationSchema, siteEvaluatorUserMessage } from "../lib/website-rubric.js";
 import { readSite, searchLinks } from "../lib/exa.js";
+import { SKILLS, skillsForType } from "../lib/skills-catalog.js";
 import { fetchSite, roastWebsite, SiteUnreadableError } from "../lib/website-pipeline.js";
 
 const SITE_TEXT = `Hi, I'm Sam. I build websites.
@@ -53,9 +54,11 @@ function rawEval(overrides = {}) {
       },
     ],
     skills: [
-      { skill: "Case study writing", why: "Your projects are only titles.", search_query: "guide to writing developer portfolio case studies" },
-      { skill: "Case Study Writing", why: "duplicate", search_query: "dup" },
-      { skill: "Positioning", why: "Your intro is generic.", search_query: "how freelancers pick a niche and write a positioning statement" },
+      { skill_id: "case-study-writing", why: "Your projects are only titles." },
+      { skill_id: "case-study-writing", why: "duplicate" },
+      { skill_id: "pricing-page", why: "Not offered for portfolios." },
+      { skill_id: "made-up-skill", why: "Not in the catalog." },
+      { skill_id: "value-proposition", why: "Your intro is generic." },
     ],
     ...overrides,
   };
@@ -103,8 +106,15 @@ test("validateSiteEvaluation keeps verified content and drops the rest", () => {
   assert.equal(evaluation.fixes[1].kind, "add");
   assert.equal(stats.fixesDropped, 1);
 
-  // Duplicate skill (case-insensitive) is dropped.
-  assert.deepEqual(evaluation.skills.map((s) => s.skill), ["Case study writing", "Positioning"]);
+  // Duplicates, ids not allowed for portfolios, and ids outside the catalog are dropped.
+  assert.deepEqual(evaluation.skills.map((s) => s.id), ["case-study-writing", "value-proposition"]);
+  assert.equal(stats.skillsDropped, 3);
+  // Links and install commands come from the catalog, not the model.
+  const caseStudy = evaluation.skills[0];
+  assert.equal(caseStudy.skill, "Case study writing");
+  assert.equal(caseStudy.why, "Your projects are only titles.");
+  assert.ok(caseStudy.learn.length >= 1 && caseStudy.learn.every((l) => l.url.startsWith("https://") && l.domain));
+  assert.ok(caseStudy.agent.every((a) => a.install.startsWith("npx ")));
   assert.equal(evaluation.score, 5);
 });
 
@@ -247,8 +257,9 @@ test("roastWebsite end to end with Exa and the model stubbed", async (t) => {
 
   assert.equal(result.siteTypeLabel, "Personal Portfolio");
   assert.equal(result.headline, "Your portfolio is a list of app names.");
-  assert.equal(result.skills.length, 2);
-  assert.ok(result.skills.every((s) => s.resources.length === 1 && s.resources[0].url.startsWith("https://learn.example/")));
+  assert.deepEqual(result.skills.map((s) => s.id), ["case-study-writing", "value-proposition"]);
+  // Only the example-sites search hits Exa now; skills come from the catalog.
+  assert.equal(exa.calls.filter((c) => c.url.endsWith("/search")).length, 1);
   assert.equal(result.exemplars.length, 1);
   assert.match(result.exemplarQuery, /Land freelance clients/);
   assert.deepEqual(result.pagesRead, ["https://sam.dev/", "https://sam.dev/about"]);
@@ -256,4 +267,28 @@ test("roastWebsite end to end with Exa and the model stubbed", async (t) => {
 
   const exemplarCall = exa.calls.find((c) => c.body.category === "personal site");
   assert.ok(exemplarCall, "portfolio exemplars search the personal-site category");
+});
+
+test("skills catalog is well-formed", () => {
+  const ids = SKILLS.map((s) => s.id);
+  assert.equal(new Set(ids).size, ids.length, "ids are unique");
+  for (const s of SKILLS) {
+    assert.ok(s.name && s.summary, `${s.id} has a name and summary`);
+    assert.ok(s.types.length && s.types.every((t) => Object.hasOwn(SITE_TYPES, t)), `${s.id} types are real`);
+    assert.ok(s.learn.length >= 1, `${s.id} has a guide`);
+    for (const l of s.learn) assert.doesNotThrow(() => new URL(l.url), `${s.id} guide url`);
+    assert.ok(s.agent.length >= 1, `${s.id} has an agent skill`);
+    for (const a of s.agent) {
+      assert.match(a.install, /^npx (skills add [\w.-]+\/[\w.-]+ --skill [\w-]+|impeccable install)$/, `${s.id} install command`);
+      assert.match(a.url, /^https:\/\/github\.com\//, `${s.id} agent url`);
+    }
+  }
+});
+
+test("every site type has at least 3 skills to choose from, and the schema enum matches", () => {
+  for (const type of Object.keys(SITE_TYPES)) {
+    const allowed = skillsForType(type).map((s) => s.id);
+    assert.ok(allowed.length >= 3, `${type} has ${allowed.length} skills`);
+    assert.deepEqual(siteEvaluationSchema(type).properties.skills.items.properties.skill_id.enum, allowed);
+  }
 });
