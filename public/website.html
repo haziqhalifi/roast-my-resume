@@ -107,7 +107,6 @@
   .link-list a:hover { background: #fff7d1; }
   .link-domain { display: block; font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
   .link-empty { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; }
-  .source-note { font-size: 0.72rem; color: var(--muted); font-family: "SF Mono", "Menlo", "Consolas", monospace; margin: 8px 0 0; line-height: 1.45; }
 
   .wrapped-skill-list li { flex-direction: column; gap: 3px; }
   .wrapped-skill-name { display: flex; gap: 9px; align-items: center; font-weight: 900; font-size: 0.9rem; }
@@ -259,7 +258,7 @@
     </div>
 
     <p class="footnote" id="limitNote">// one website roast per device per day. make it count.</p>
-    <p class="footnote">// we read your site's public text via Exa and send it to a third-party AI. we don't save it.</p>
+    <p class="footnote">// we read your site's public text and send it to a third-party AI. we don't save it.</p>
 
     <div id="error"></div>
 
@@ -292,14 +291,12 @@
         <h3 class="report-sub">Skills to level up</h3>
         <p class="skills-intro">Learn it yourself with the free guides, or install the AI agent skill so Claude Code, Cursor or Codex can apply it to your site. Install commands use the <a href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener">skills CLI</a>; run them in your site's project folder.</p>
         <div id="reportSkills"></div>
-        <h3 class="report-sub">Sites like yours to study</h3>
-        <div class="report-card" id="reportExemplars"></div>
         <h3 class="report-sub">What we read</h3>
         <div class="report-card"><ul class="report-evidence" id="reportPages"></ul></div>
         <p class="disclaimer">
           We judge the words and links on your site against what a <span id="disclaimerType">site like yours</span> needs to do.
           We can't see colors, layout, images or load speed, so none of that is scored. Every quote was checked against your site's text;
-          skills, guides and agent skills come from a list we researched and checked by hand, never from the AI. Example sites come from a live Exa search and aren't vetted.
+          skills, guides and agent skills come from a list we researched and checked by hand, never from the AI.
         </p>
         <a class="how-link mono on-light" href="/how-it-works.html#website">// how we roast you ↗</a>
       </section>
@@ -745,10 +742,6 @@
         });
       });
 
-      const exemplars = result.exemplars || [];
-      document.getElementById("reportExemplars").innerHTML = exemplars.length
-        ? `${linkList(exemplars)}<p class="source-note">// found by Exa search for: "${escapeHtml(result.exemplarQuery)}". look at how they say it, don't copy what they say.</p>`
-        : `<p class="link-empty">Exa didn't return examples this time.</p>`;
 
       document.getElementById("reportPages").innerHTML = (result.pagesRead || [result.url])
         .map((u) => `<li>${escapeHtml(u)}</li>`)
@@ -873,7 +866,7 @@
     ];
     const LOADING_SUBSTEPS = [
       "// this can take up to 45 seconds. don't close the tab.",
-      "// Exa reads your site, then one AI scores it and another roasts it.",
+      "// we read your site, then one AI scores it and another roasts it.",
       "// almost there, brace yourself.",
     ];
 

@@ -26,7 +26,7 @@ The resume is wrapped in tags and treated as untrusted data, so text like "ignor
 
 `/website.html` roasts a website in the same style and hands back fixes, skills to learn, and example sites to study. It uses the same score-then-roast split and server-side checks as the resume roaster ([lib/website-pipeline.js](lib/website-pipeline.js)):
 
-1. **Read** ([lib/exa.js](lib/exa.js)): [Exa](https://exa.ai) `/contents` returns the visible text of the homepage, up to 3 same-site subpages (like `/about` or `/pricing`, picked per site type) and the page's links. The server never fetches the URL itself, and localhost/private-network URLs are rejected up front. Pages with almost no readable text (image-only or JavaScript-only sites) return 422 and the user's slot is refunded.
+1. **Read** ([lib/site-reader.js](lib/site-reader.js)): the server fetches the homepage and up to 3 same-site subpages (like `/about` or `/pricing`, picked per site type from the homepage's links) and keeps the visible text, title, meta description and links. SSRF guards: the resolved IP is checked at connect time (so DNS rebinding can't bypass it), private/loopback/link-local ranges and non-80/443 ports are refused, redirects are re-checked on every hop (max 4), and responses are capped at 2 MB and 10 s. It doesn't run JavaScript. Pages with almost no readable text (image-only or JavaScript-only sites) return 422 and the user's slot is refunded.
 2. **Evaluate** ([lib/website-rubric.js](lib/website-rubric.js)): the user picks a site type and can add a goal ("land freelance clients"). Each type has its own 5 weighted categories:
 
    | Type | Categories |
@@ -40,13 +40,13 @@ The resume is wrapped in tags and treated as untrusted data, so text like "ignor
 
    The goal steers the fixes and skills. The model also flags when the site doesn't look like the chosen type.
 3. **Validate** ([lib/website-validate.js](lib/website-validate.js)): evidence and "before" lines must be verbatim from the site text. A fix can also be an *addition* (empty "before") for something missing, like a CTA. Rewrites can't invent numbers or use marketing filler. Only the text, links and image count are shown to the model, and it is told it can't see visual design or speed and must not judge them.
-4. **Roast + skills + examples** (in parallel): the roast is written from the validated findings. The model picks 3 skills by id from a fixed catalog ([lib/skills-catalog.js](lib/skills-catalog.js)) and says why each fits; the server attaches that skill's free guides and installable AI agent skills (e.g. `npx skills add anthropics/skills --skill frontend-design`). Only example sites are a live Exa `/search`, for the type and goal. The model never writes a URL or install command.
+4. **Roast + skills**: the roast is written from the validated findings. The model picks 3 skills by id from a fixed catalog ([lib/skills-catalog.js](lib/skills-catalog.js)) and says why each fits; the server attaches that skill's free guides and installable AI agent skills (e.g. `npx skills add anthropics/skills --skill frontend-design`). The model never writes a URL or install command.
 
 Website roasts have their own usage counters (Redis namespace `usage-web`, or `data/usage-web.json` locally), so they don't use up a resume roast. `/api/public-stats`, `/api/view` and `/api/stats` take `?app=website` for the website counters.
 
-Limitations: only the text is judged, not layout, images or speed. Pages that render their text entirely with JavaScript may not be readable. Example sites come from live search and aren't hand-vetted.
+Limitations: only the text is judged, not layout, images or speed. Pages that render their text entirely with JavaScript may not be readable.
 
-**Skills catalog:** 15 skills across UX, visual design, copy, conversion, trust, SEO, content, email, pricing, product pages and customer research, each with 1-2 free guides and 1-2 agent skills (from `anthropics/skills`, `vercel-labs/agent-skills`, `coreyhaines31/marketingskills`, `deanpeters/Product-Manager-Skills`, `nextlevelbuilder/ui-ux-pro-max-skill`, `pbakaus/impeccable`). Each skill lists the site types it applies to, and the schema only allows those ids for the chosen type. Researched with Exa in September 2026; links and skill names were checked then, so re-check when editing.
+**Skills catalog:** 15 skills across UX, visual design, copy, conversion, trust, SEO, content, email, pricing, product pages and customer research, each with 1-2 free guides and 1-2 agent skills (from `anthropics/skills`, `vercel-labs/agent-skills`, `coreyhaines31/marketingskills`, `deanpeters/Product-Manager-Skills`, `nextlevelbuilder/ui-ux-pro-max-skill`, `pbakaus/impeccable`). Each skill lists the site types it applies to, and the schema only allows those ids for the chosen type. Researched in September 2026; links and skill names were checked then, so re-check when editing.
 
 ## Usage limits and tracking
 
@@ -76,26 +76,24 @@ To provision Redis on a new project: `vercel integration add upstash/upstash-kv`
 ## Setup
 
 1. Get a free API key at https://openrouter.ai/keys
-2. For website roasts, also get an Exa key at https://dashboard.exa.ai/api-keys (optional; the resume roaster works without it)
-3. Copy `.env.example` to `.env` and paste your keys in:
+2. Copy `.env.example` to `.env` and paste your key in:
    ```
    cp .env.example .env
    ```
-4. Install dependencies:
+3. Install dependencies:
    ```
    npm install
    ```
-5. Run it:
+4. Run it:
    ```
    npm start
    ```
-6. Open http://localhost:3000 and pick a roaster
+5. Open http://localhost:3000 and pick a roaster
 
 ## Stack
 
 - Node + Express backend (`/api/roast` for resumes, `/api/roast-website` for websites)
 - Plain HTML/CSS/JS frontend, no build step (shared styles in `public/roast.css`)
-- Exa for reading websites and finding learning resources (website roasts only)
 - OpenRouter for the LLM calls (defaults to `openai/gpt-4o-mini`; swap via `OPENROUTER_MODEL`, or set `OPENROUTER_EVAL_MODEL` for scoring only)
 - No auth or persistent storage. Resumes are sent to OpenRouter and the model provider but not saved by this app.
 

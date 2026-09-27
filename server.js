@@ -17,7 +17,6 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const ROAST_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
 const EVAL_MODEL = process.env.OPENROUTER_EVAL_MODEL || ROAST_MODEL;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
-const EXA_API_KEY = process.env.EXA_API_KEY;
 
 const usageLimits = {
   perDevicePerDay: Number(process.env.ROASTS_PER_DEVICE_PER_DAY ?? 1),
@@ -142,9 +141,8 @@ app.post("/api/roast-website", async (req, res) => {
   if (!Object.hasOwn(STYLES, style)) {
     return res.status(400).json({ error: "Unknown roast style." });
   }
-  if (!OPENROUTER_API_KEY || !EXA_API_KEY) {
-    const missing = [!OPENROUTER_API_KEY && "OPENROUTER_API_KEY", !EXA_API_KEY && "EXA_API_KEY"].filter(Boolean).join(" and ");
-    return res.status(500).json({ error: `Server is missing ${missing}. Add it to .env and restart.` });
+  if (!OPENROUTER_API_KEY) {
+    return res.status(500).json({ error: "Server is missing OPENROUTER_API_KEY. Add it to .env and restart." });
   }
 
   let slot;
@@ -162,7 +160,6 @@ app.post("/api/roast-website", async (req, res) => {
   try {
     const result = await roastWebsite({
       apiKey: OPENROUTER_API_KEY,
-      exaKey: EXA_API_KEY,
       evalModel: EVAL_MODEL,
       roastModel: ROAST_MODEL,
       url,
@@ -215,7 +212,7 @@ if (isMain) {
     console.log(`Roast My Resume running at http://localhost:${PORT}`);
     console.log(`Scoring: ${EVAL_MODEL} | Roasting: ${ROAST_MODEL}`);
     console.log(`Limits: ${usage.limits.perDevicePerDay}/device/day, ${usage.limits.perIpPerDay}/IP/day, ${usage.limits.globalPerDay}/day total`);
-    console.log(`Website roasts: ${EXA_API_KEY ? "enabled" : "disabled (set EXA_API_KEY)"} | ${siteUsage.limits.perDevicePerDay}/device/day`);
+    console.log(`Website roasts: ${siteUsage.limits.perDevicePerDay}/device/day`);
   });
 }
 

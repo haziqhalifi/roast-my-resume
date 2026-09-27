@@ -2,7 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { normalizeSiteUrl, siteCorpus, validateSiteEvaluation } from "../lib/website-validate.js";
 import { SITE_TYPES, siteEvaluationSchema, siteEvaluatorUserMessage } from "../lib/website-rubric.js";
-import { readSite, searchLinks } from "../lib/exa.js";
+import http from "node:http";
+import zlib from "node:zlib";
+import { htmlToPage, isPrivateAddress, pickSubpages, readSite, safeGet } from "../lib/site-reader.js";
 import { SKILLS, skillsForType } from "../lib/skills-catalog.js";
 import { fetchSite, roastWebsite, SiteUnreadableError } from "../lib/website-pipeline.js";
 
@@ -132,102 +134,106 @@ test("validateSiteEvaluation reports non-websites", () => {
   assert.deepEqual({ ok: result.ok, isWebsite: result.isWebsite, reason: result.reason }, { ok: true, isWebsite: false, reason: "Parked domain." });
 });
 
-function fakeFetch(routes) {
-  const calls = [];
-  const impl = async (url, init) => {
-    const body = JSON.parse(init.body);
-    calls.push({ url, body });
-    const handler = routes[new URL(url).pathname];
-    const out = await handler(body, calls.length);
-    return {
-      ok: out.status ? out.status < 400 : true,
-      status: out.status || 200,
-      json: async () => out.json,
-      text: async () => JSON.stringify(out.json || {}),
-    };
-  };
-  return { impl, calls };
+const HOME_HTML = `<!doctype html><html><head><title>Sam &amp; Co | Developer</title>
+<meta name="description" content="Fast stores for small food businesses.">
+<style>body{color:red}</style><script>var hidden = "do not read me";</script></head>
+<body><nav><a href="/">Home</a><a href="/about">About</a><a href="/projects/">Projects</a><a href="https://github.com/sam">GitHub</a><a href="mailto:sam@example.com">Email</a></nav>
+<main><h1>Hi, I&rsquo;m Sam.</h1><p>I build websites.<br>Cut checkout time by 40% for a bakery.</p>
+<img src="a.png"><img src="b.png"><!-- secret comment --><a href="/cv.pdf">CV</a></main></body></html>`;
+
+// A tiny local site: home, two subpages, a redirect, a gzip page and a non-HTML file.
+async function startSite(t) {
+  const server = http.createServer((req, res) => {
+    if (req.url === "/") return res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(HOME_HTML);
+    if (req.url === "/about") return res.writeHead(200, { "Content-Type": "text/html" }).end("<h1>About Sam</h1><p>3 years with React.</p>");
+    if (req.url === "/projects" || req.url === "/projects/") return res.writeHead(200, { "Content-Type": "text/html" }).end("<h2>Weather App</h2>");
+    if (req.url === "/old") return res.writeHead(301, { Location: "/" }).end();
+    if (req.url === "/gz") {
+      return res.writeHead(200, { "Content-Type": "text/html", "Content-Encoding": "gzip" }).end(zlib.gzipSync("<p>zipped hello</p>"));
+    }
+    if (req.url === "/file.json") return res.writeHead(200, { "Content-Type": "application/json" }).end("{}");
+    res.writeHead(404).end();
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  t.after(() => server.close());
+  return `http://127.0.0.1:${server.address().port}`;
 }
 
-test("readSite returns text, same-site subpages and links", async () => {
-  const { impl, calls } = fakeFetch({
-    "/contents": () => ({
-      json: {
-        results: [
-          {
-            url: "https://sam.dev/",
-            title: "Sam",
-            text: SITE_TEXT,
-            subpages: [
-              { url: "https://sam.dev/about", title: "About", text: "About me" },
-              { url: "https://evil.example/", title: "Other", text: "Not this site" },
-            ],
-            extras: { links: ["https://github.com/sam", 42], imageLinks: ["a.png", "b.png"] },
-          },
-        ],
-        statuses: [{ id: "https://sam.dev/", status: "success" }],
-      },
-    }),
-  });
-  const result = await readSite("https://sam.dev/", { apiKey: "k", subpageTargets: ["about"], fetchImpl: impl });
-  assert.equal(result.ok, true);
-  assert.equal(result.domain, "sam.dev");
-  assert.deepEqual(result.subpages.map((s) => s.url), ["https://sam.dev/about"]);
-  assert.deepEqual(result.links, ["https://github.com/sam"]);
-  assert.equal(result.imageCount, 2);
-  assert.deepEqual(calls[0].body.subpageTarget, ["about"]);
+test("isPrivateAddress blocks internal ranges and allows public ones", () => {
+  for (const ip of ["127.0.0.1", "10.1.2.3", "172.16.0.1", "172.31.255.255", "192.168.1.1", "169.254.169.254", "100.64.0.1", "0.0.0.0", "224.0.0.1", "::1", "::", "fd00::1", "fe80::1", "::ffff:127.0.0.1", "[::1]"]) {
+    assert.equal(isPrivateAddress(ip), true, ip);
+  }
+  for (const ip of ["8.8.8.8", "1.1.1.1", "172.32.0.1", "93.184.216.34", "2606:4700:4700::1111"]) {
+    assert.equal(isPrivateAddress(ip), false, ip);
+  }
 });
 
-test("readSite retries without subpages if Exa rejects them", async () => {
-  const { impl, calls } = fakeFetch({
-    "/contents": (body) =>
-      body.subpages ? { status: 400, json: { error: "bad subpages" } } : { json: { results: [{ url: "https://sam.dev/", text: SITE_TEXT }] } },
-  });
-  const result = await readSite("https://sam.dev/", { apiKey: "k", subpageTargets: ["about"], fetchImpl: impl });
-  assert.equal(result.ok, true);
-  assert.equal(calls.length, 2);
+test("safeGet refuses private addresses, odd ports and credentials by default", async () => {
+  await assert.rejects(safeGet("http://127.0.0.1/"), { reason: "private_address" });
+  await assert.rejects(safeGet("http://[::1]/"), { reason: "private_address" });
+  await assert.rejects(safeGet("http://localhost/"), { reason: "private_address" }); // blocked at DNS lookup
+  await assert.rejects(safeGet("http://example.com:8080/"), { reason: "port" });
+  await assert.rejects(safeGet("http://user:pw@example.com/"), { reason: "credentials" });
+  await assert.rejects(safeGet("ftp://example.com/"), { reason: "protocol" });
 });
 
-test("readSite reports crawl errors as unreadable", async () => {
-  const { impl } = fakeFetch({
-    "/contents": () => ({ json: { results: [], statuses: [{ id: "https://nope.dev/", status: "error", error: { tag: "CRAWL_NOT_FOUND" } }] } }),
-  });
-  const result = await readSite("https://nope.dev/", { apiKey: "k", fetchImpl: impl });
-  assert.deepEqual(result, { ok: false, reason: "CRAWL_NOT_FOUND" });
+test("htmlToPage keeps visible text, title, description, links and image count", () => {
+  const page = htmlToPage(HOME_HTML, "https://sam.dev/");
+  assert.equal(page.title, "Sam & Co | Developer");
+  assert.equal(page.description, "Fast stores for small food businesses.");
+  assert.match(page.text, /Hi, I’m Sam\./);
+  assert.match(page.text, /Cut checkout time by 40% for a bakery\./);
+  assert.doesNotMatch(page.text, /do not read me|color:red|secret comment/);
+  assert.deepEqual(page.links, ["https://sam.dev/", "https://sam.dev/about", "https://sam.dev/projects/", "https://github.com/sam", "https://sam.dev/cv.pdf"]);
+  assert.equal(page.imageCount, 2);
 });
 
-test("searchLinks drops excluded, duplicate and non-http results", async () => {
-  const { impl, calls } = fakeFetch({
-    "/search": () => ({
-      json: {
-        results: [
-          { url: "https://sam.dev/blog", title: "Own site" },
-          { url: "https://www.guide.com/a", title: "Guide A" },
-          { url: "https://guide.com/b", title: "Guide B (same domain)" },
-          { url: "ftp://files.net/x", title: "FTP" },
-          { url: "https://other.org/c", title: "  Other\n guide " },
-        ],
-      },
-    }),
-  });
-  const links = await searchLinks("q", { apiKey: "k", excludeDomains: ["sam.dev"], fetchImpl: impl });
-  assert.deepEqual(links.map((l) => l.url), ["https://www.guide.com/a", "https://other.org/c"]);
-  assert.equal(links[1].title, "Other guide");
-  assert.deepEqual(calls[0].body.excludeDomains, ["sam.dev"]);
+test("pickSubpages chooses same-site pages matching the targets, best first", () => {
+  const links = ["https://sam.dev/", "https://www.sam.dev/work/shop", "https://sam.dev/about-me", "https://other.dev/about", "https://sam.dev/about/cv.pdf", "https://sam.dev/projects"];
+  assert.deepEqual(pickSubpages(links, "https://sam.dev/", ["projects", "work", "about"]), [
+    "https://sam.dev/projects",
+    "https://www.sam.dev/work/shop",
+    "https://sam.dev/about-me",
+  ]);
+});
+
+test("readSite reads the homepage and matching subpages from a real server", async (t) => {
+  const base = await startSite(t);
+  const site = await readSite(`${base}/`, { subpageTargets: ["projects", "about"], allowPrivate: true });
+  assert.equal(site.ok, true);
+  assert.equal(site.title, "Sam & Co | Developer");
+  assert.match(site.text, /I build websites\./);
+  assert.deepEqual(site.subpages.map((p) => new URL(p.url).pathname), ["/projects/", "/about"]);
+  assert.match(site.subpages[1].text, /3 years with React\./);
+});
+
+test("readSite follows redirects, decodes gzip and reports errors", async (t) => {
+  const base = await startSite(t);
+  const redirected = await readSite(`${base}/old`, { allowPrivate: true });
+  assert.equal(new URL(redirected.url).pathname, "/");
+  const gz = await readSite(`${base}/gz`, { allowPrivate: true });
+  assert.equal(gz.text, "zipped hello");
+  assert.deepEqual(await readSite(`${base}/missing`, { allowPrivate: true }), { ok: false, reason: "http_404", message: "The site responded with an error (404)." });
+  assert.equal((await readSite(`${base}/file.json`, { allowPrivate: true })).reason, "not_html");
+  // Without the test-only flag, the same local server is refused (random port and loopback IP).
+  const refused = await readSite(`${base}/`);
+  assert.equal(refused.ok, false);
+  assert.ok(["port", "private_address"].includes(refused.reason), refused.reason);
+  assert.equal((await readSite(base.replace(/:\d+$/, "/"))).reason, "private_address");
 });
 
 test("fetchSite flags near-empty pages as unreadable (so the slot is refunded)", async () => {
-  const { impl } = fakeFetch({ "/contents": () => ({ json: { results: [{ url: "https://sam.dev/", text: "Loading..." }] } }) });
-  await assert.rejects(fetchSite({ exaKey: "k", url: "https://sam.dev/", siteType: "portfolio", fetchImpl: impl }), SiteUnreadableError);
+  const reader = async () => ({ ok: true, url: "https://sam.dev/", domain: "sam.dev", title: "", description: "", text: "Loading...", subpages: [], links: [], imageCount: 0 });
+  await assert.rejects(fetchSite({ url: "https://sam.dev/", siteType: "portfolio", reader }), SiteUnreadableError);
+  const failing = async () => ({ ok: false, reason: "private_address", message: "x" });
+  await assert.rejects(fetchSite({ url: "https://sam.dev/", siteType: "portfolio", reader: failing }), /isn't a public website/);
 });
 
-test("roastWebsite end to end with Exa and the model stubbed", async (t) => {
-  const exa = fakeFetch({
-    "/contents": () => ({ json: { results: [{ url: "https://sam.dev/", title: "Sam", text: SITE_TEXT, subpages: site.subpages }] } }),
-    "/search": (body) => ({
-      json: { results: [{ url: `https://learn.example/${encodeURIComponent(body.query.slice(0, 10))}`, title: `Guide for ${body.query.slice(0, 20)}` }] },
-    }),
-  });
+test("roastWebsite end to end with the site reader and the model stubbed", async (t) => {
+  const reader = async (url, opts) => {
+    assert.deepEqual(opts.subpageTargets, SITE_TYPES.portfolio.subpageTargets);
+    return { ok: true, ...site, description: "" };
+  };
 
   // callModel uses the global fetch; answer the scoring call and the roast call.
   const realFetch = globalThis.fetch;
@@ -244,7 +250,6 @@ test("roastWebsite end to end with Exa and the model stubbed", async (t) => {
   const usage = [];
   const result = await roastWebsite({
     apiKey: "or",
-    exaKey: "exa",
     evalModel: "m",
     roastModel: "m",
     url: "https://sam.dev/",
@@ -252,21 +257,15 @@ test("roastWebsite end to end with Exa and the model stubbed", async (t) => {
     goal: "Land freelance clients",
     style: "savage",
     onUsage: (u) => usage.push(u),
-    fetchImpl: exa.impl,
+    reader,
   });
 
   assert.equal(result.siteTypeLabel, "Personal Portfolio");
   assert.equal(result.headline, "Your portfolio is a list of app names.");
   assert.deepEqual(result.skills.map((s) => s.id), ["case-study-writing", "value-proposition"]);
-  // Only the example-sites search hits Exa now; skills come from the catalog.
-  assert.equal(exa.calls.filter((c) => c.url.endsWith("/search")).length, 1);
-  assert.equal(result.exemplars.length, 1);
-  assert.match(result.exemplarQuery, /Land freelance clients/);
+  assert.equal("exemplars" in result, false);
   assert.deepEqual(result.pagesRead, ["https://sam.dev/", "https://sam.dev/about"]);
   assert.equal(usage.length, 2);
-
-  const exemplarCall = exa.calls.find((c) => c.body.category === "personal site");
-  assert.ok(exemplarCall, "portfolio exemplars search the personal-site category");
 });
 
 test("skills catalog is well-formed", () => {
