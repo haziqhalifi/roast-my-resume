@@ -3,29 +3,119 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roast My Resume 🔥</title>
+<title>Roast My Website 🔥</title>
 <link rel="stylesheet" href="/roast.css" />
+<style>
+  .url-field {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid var(--black);
+    background: #fff;
+    box-shadow: 3px 3px 0 var(--black);
+  }
+  .url-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    background: var(--black);
+    color: var(--yellow);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+  #siteUrl, #siteGoal {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    padding: 15px 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--black);
+    background: #fff;
+  }
+  #siteUrl:focus, #siteGoal:focus { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+  .type-grid .tab { padding: 14px 8px; gap: 6px; text-align: center; }
+  .type-tag {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #4b4b4f;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .type-help { font-size: 0.78rem; color: #4b4b4f; margin: 10px 0 0; line-height: 1.45; }
+
+  .goal-field { border: 2px solid var(--black); background: #fff; box-shadow: 3px 3px 0 var(--black); display: flex; }
+  .goal-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .goal-chip {
+    border: 2px solid var(--black);
+    background: #fff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--black);
+  }
+  .goal-chip:active { transform: translate(1px, 1px); }
+  .goal-chip.active { background: var(--yellow); }
+  .goal-count { font-size: 0.7rem; color: var(--muted); text-align: right; margin-top: 6px; }
+
+  .type-note {
+    background: #fff7d1;
+    border: 2px solid var(--black);
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 14px;
+  }
+  .fix-add { font-size: 0.86rem; color: #6b6b70; font-style: italic; margin: 0; }
+
+  .skill-why { font-size: 0.86rem; line-height: 1.45; color: #2b2b2e; margin: 6px 0 0; }
+  .link-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .link-list a {
+    display: block;
+    background: var(--paper);
+    border-left: 3px solid var(--red);
+    padding: 7px 9px;
+    color: var(--black);
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-decoration: none;
+    word-break: break-word;
+  }
+  .link-list a:hover { background: #fff7d1; }
+  .link-domain { display: block; font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .link-empty { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; }
+  .source-note { font-size: 0.72rem; color: var(--muted); font-family: "SF Mono", "Menlo", "Consolas", monospace; margin: 8px 0 0; line-height: 1.45; }
+
+  .wrapped-skill-list li { flex-direction: column; gap: 3px; }
+  .wrapped-skill-name { display: flex; gap: 9px; align-items: center; font-weight: 900; font-size: 0.9rem; }
+  .wrapped-skill-why { font-size: 0.76rem; font-weight: 600; opacity: 0.85; padding-left: 31px; }
+  .wrapped-site { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 0.72rem; opacity: 0.8; word-break: break-all; }
+</style>
 </head>
 <body>
   <header>
     <div class="header-top">
       <span class="badge mono">v1.0 // CERTIFIED HAZARD</span>
-      <div class="archive-icon">🗄</div>
+      <div class="archive-icon">🌐</div>
     </div>
-    <h1>ROAST<br>MY<br><span class="highlight">RESUME<span class="asterisk">✱</span></span></h1>
-    <p class="subtitle">✱ side effects may include career reconsideration, mild sweating, and going viral.</p>
-    <a class="how-link mono" href="/how-it-works.html">// how we roast you ↗</a>
-    <a class="how-link mono cross-link" href="/website.html">// roast a website instead ↗</a>
+    <h1>ROAST<br>MY<br><span class="highlight">WEBSITE<span class="asterisk">✱</span></span></h1>
+    <p class="subtitle">✱ we read every word on your site, judge it against what that kind of site is for, and hand you the fixes and the skills to learn.</p>
+    <a class="how-link mono" href="/how-it-works.html#website">// how we roast you ↗</a>
+    <a class="how-link mono cross-link" href="/">// roast a resume instead ↗</a>
   </header>
 
   <div class="marquee">
-    <div class="marquee-track">⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp; ⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp;</div>
+    <div class="marquee-track">⚠ ROAST ZONE &nbsp;&nbsp; ⚠ BOUNCE RATE CRITICAL &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp; ⚠ ROAST ZONE &nbsp;&nbsp; ⚠ BOUNCE RATE CRITICAL &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp;</div>
   </div>
 
   <div class="stats-strip" id="statsStrip">
     <div class="stat-block">
       <span class="stat-num" id="statRoasts">—</span>
-      <span class="stat-label">resumes roasted</span>
+      <span class="stat-label">websites roasted</span>
     </div>
     <div class="stat-divider"></div>
     <div class="stat-block">
@@ -51,30 +141,42 @@
 
     <div class="section-label">
       <span class="section-num mono">01</span>
-      <h2 class="section-title">Feed the machine</h2>
+      <h2 class="section-title">Drop the link</h2>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" id="tabPaste">
-        <span class="icon">✏️</span>
-        <span>Paste Text</span>
-      </div>
-      <div class="tab" id="tabUpload">
-        <span class="icon">📄</span>
-        <span>Upload PDF</span>
-      </div>
-    </div>
-
-    <textarea id="resumeText" placeholder="Paste your resume here. Every buzzword, every 'synergy', every 'passionate about'..."></textarea>
-
-    <div class="upload-zone" id="uploadZone" style="display:none; margin-top: 0;">
-      <input type="file" id="pdfInput" accept="application/pdf" />
-      <label for="pdfInput">Choose PDF</label>
-      <div class="upload-filename" id="uploadFilename">No file chosen yet.</div>
+    <div class="url-field">
+      <span class="url-prefix mono">URL</span>
+      <input id="siteUrl" type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="yourwebsite.com" />
     </div>
 
     <div class="section-label" style="margin-top: 28px;">
       <span class="section-num mono">02</span>
+      <h2 class="section-title">What kind of site?</h2>
+    </div>
+
+    <div class="type-grid" id="typeGrid">
+      <div class="tab active" data-type="portfolio"><span class="icon">🧑‍💻</span><span>Portfolio</span><span class="type-tag">// get hired</span></div>
+      <div class="tab" data-type="business"><span class="icon">🏪</span><span>Business Page</span><span class="type-tag">// get customers</span></div>
+      <div class="tab" data-type="saas"><span class="icon">🚀</span><span>Startup / SaaS</span><span class="type-tag">// get signups</span></div>
+      <div class="tab" data-type="ecommerce"><span class="icon">🛒</span><span>Online Store</span><span class="type-tag">// get sales</span></div>
+      <div class="tab" data-type="blog"><span class="icon">✍️</span><span>Blog / Creator</span><span class="type-tag">// get readers</span></div>
+      <div class="tab" data-type="other"><span class="icon">🧩</span><span>Something Else</span><span class="type-tag">// tell us below</span></div>
+    </div>
+    <p class="type-help" id="typeHelp"></p>
+
+    <div class="section-label" style="margin-top: 28px;">
+      <span class="section-num mono">03</span>
+      <h2 class="section-title">What's it supposed to do?</h2>
+    </div>
+
+    <div class="goal-field">
+      <input id="siteGoal" type="text" maxlength="200" placeholder="Optional, but it makes the advice fit you" />
+    </div>
+    <div class="goal-chips" id="goalChips"></div>
+    <p class="goal-count mono" id="goalCount">0/200</p>
+
+    <div class="section-label" style="margin-top: 22px;">
+      <span class="section-num mono">04</span>
       <h2 class="section-title">Pick your poison</h2>
     </div>
 
@@ -119,7 +221,7 @@
             <span class="style-name">🎭 Shakespearean</span>
             <span class="style-tag">// THY DOOM</span>
           </div>
-          <div class="style-desc">Bardic drama. Forsooth, thou art cooked.</div>
+          <div class="style-desc">Bardic drama. Forsooth, thy homepage is cooked.</div>
         </div>
       </div>
     </div>
@@ -132,13 +234,13 @@
       <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
       <div class="loading-status">
         <span class="loading-dot"></span>
-        <span class="loading-text" id="loadingText">Reading your resume...</span>
+        <span class="loading-text" id="loadingText">Visiting your site...</span>
       </div>
-      <p class="loading-substep" id="loadingSubstep">// this can take up to 30 seconds. don't close the tab.</p>
+      <p class="loading-substep" id="loadingSubstep">// this can take up to 45 seconds. don't close the tab.</p>
     </div>
 
-    <p class="footnote" id="limitNote">// one roast per device per day. make it count.</p>
-    <p class="footnote">// your resume is reviewed by a third-party AI provider. we don't save it. only your dignity is at risk.</p>
+    <p class="footnote" id="limitNote">// one website roast per device per day. make it count.</p>
+    <p class="footnote">// we read your site's public text via Exa and send it to a third-party AI. we don't save it.</p>
 
     <div id="error"></div>
 
@@ -155,45 +257,47 @@
         <button id="shareBtn" class="primary">↗ Share</button>
       </div>
       <p class="wrapped-status" id="wrappedStatus"></p>
-      <button class="wrapped-again" id="roastAgainBtn">↺ Roast again</button>
+      <button class="wrapped-again" id="roastAgainBtn">↺ Roast another site</button>
 
       <section id="report">
         <div class="section-label">
-          <span class="section-num mono">03</span>
+          <span class="section-num mono">05</span>
           <h2 class="section-title">The full report</h2>
         </div>
+        <div id="reportTypeNote"></div>
         <div id="reportCategories"></div>
         <h3 class="report-sub">What's working</h3>
         <div class="report-card"><ul class="report-strengths" id="reportStrengths"></ul></div>
         <h3 class="report-sub">Fix these first</h3>
         <div id="reportFixes"></div>
+        <h3 class="report-sub">Skills to level up</h3>
+        <div id="reportSkills"></div>
+        <h3 class="report-sub">Sites like yours to study</h3>
+        <div class="report-card" id="reportExemplars"></div>
+        <h3 class="report-sub">What we read</h3>
+        <div class="report-card"><ul class="report-evidence" id="reportPages"></ul></div>
         <p class="disclaimer">
-          Scored against common recruiter and applicant-tracking-system (ATS) guidelines: impact, readability, clarity, consistency and skills.
-          AI-generated feedback, not professional career advice. Every quote above was checked against your resume; double-check rewrites before you apply.
+          We judge the words and links on your site against what a <span id="disclaimerType">site like yours</span> needs to do.
+          We can't see colors, layout, images or load speed, so none of that is scored. Every quote was checked against your site's text;
+          learning links and example sites come from Exa search, not from the AI, but we haven't vetted each one.
         </p>
-        <a class="how-link mono on-light" href="/how-it-works.html">// how we roast you ↗</a>
+        <a class="how-link mono on-light" href="/how-it-works.html#website">// how we roast you ↗</a>
       </section>
     </div>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    if (window["pdfjsLib"]) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    }
-
-    // Social-proof strip: fire a page-view beacon (cheap, no model call, not rate-limited)
-    // and pull the running totals. Hide the strip entirely rather than show a broken "—".
+    // Social-proof strip for website roasts: separate counters from the resume roaster.
     (function () {
       try {
-        if (navigator.sendBeacon) navigator.sendBeacon("/api/view");
-        else fetch("/api/view", { method: "POST", keepalive: true }).catch(() => {});
+        if (navigator.sendBeacon) navigator.sendBeacon("/api/view?app=website");
+        else fetch("/api/view?app=website", { method: "POST", keepalive: true }).catch(() => {});
       } catch {
         // A missed view tick is cosmetic only.
       }
 
-      fetch("/api/public-stats")
+      fetch("/api/public-stats?app=website")
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((data) => {
           document.getElementById("statRoasts").textContent = (data.totalRoasts ?? 0).toLocaleString();
@@ -204,10 +308,9 @@
         });
     })();
 
-    const MIN_CHARS = 150;
-    const MAX_CHARS = 20000;
+    const MAX_GOAL = 200;
 
-    // Per-browser id so one device gets one roast a day. Not security: the server also limits per IP and per day.
+    // Same per-browser id as the resume page; the server keeps website roasts on separate counters.
     function deviceId() {
       try {
         let id = localStorage.getItem("rmr-device-id");
@@ -221,8 +324,7 @@
       }
     }
 
-    // Keeps the last roast on this device (not the server) so it's there again days later.
-    const LAST_RESULT_KEY = "rmr-last-result";
+    const LAST_RESULT_KEY = "rmw-last-result";
 
     function saveLastResult(result) {
       try {
@@ -249,67 +351,81 @@
       }
     }
 
+    // Personalization: each type changes what the site is judged on, and the goal steers the
+    // fixes, the skills and the example sites. The chips just make a good goal easy to type.
+    const SITE_TYPE_META = {
+      portfolio: {
+        label: "Personal Portfolio",
+        help: "Judged on: who & what, proof of work, positioning, credibility, contact.",
+        goals: ["Get hired as a frontend developer", "Land freelance design clients", "Break into UX research"],
+      },
+      business: {
+        label: "Business Landing Page",
+        help: "Judged on: value proposition, call to action, trust, customer-focused copy, the essentials.",
+        goals: ["Get more bookings", "Get more quote requests", "More calls from local customers"],
+      },
+      saas: {
+        label: "Startup / SaaS Product",
+        help: "Judged on: value proposition, showing the product, signup path, trust, objection handling.",
+        goals: ["More free-trial signups", "More demo bookings", "Explain it to non-technical buyers"],
+      },
+      ecommerce: {
+        label: "Online Store",
+        help: "Judged on: brand & offer, product presentation, path to purchase, trust & reviews, navigation.",
+        goals: ["More first-time purchases", "Build trust as a new brand", "Bigger average orders"],
+      },
+      blog: {
+        label: "Blog / Creator Site",
+        help: "Judged on: clear niche, content quality, audience capture, discoverability, author credibility.",
+        goals: ["Grow my newsletter", "Get more returning readers", "Land sponsorships"],
+      },
+      other: {
+        label: "Something Else",
+        help: "Judged on: clarity of purpose, copy, next step, trust, structure. Tell us the goal below.",
+        goals: ["Get people to sign up", "Get donations", "Get event registrations"],
+      },
+    };
+
     let level = "savage";
-    let mode = "paste";
-    let pdfText = "";
+    let siteType = "portfolio";
 
-    const resumeTextEl = document.getElementById("resumeText");
-    const uploadZone = document.getElementById("uploadZone");
-    const tabPaste = document.getElementById("tabPaste");
-    const tabUpload = document.getElementById("tabUpload");
-    const pdfInput = document.getElementById("pdfInput");
-    const uploadFilename = document.getElementById("uploadFilename");
+    const siteUrlEl = document.getElementById("siteUrl");
+    const siteGoalEl = document.getElementById("siteGoal");
+    const goalChips = document.getElementById("goalChips");
+    const goalCount = document.getElementById("goalCount");
+    const typeHelp = document.getElementById("typeHelp");
 
-    tabPaste.addEventListener("click", () => {
-      mode = "paste";
-      tabPaste.classList.add("active");
-      tabUpload.classList.remove("active");
-      resumeTextEl.style.display = "block";
-      uploadZone.style.display = "none";
+    function renderGoalChips() {
+      const meta = SITE_TYPE_META[siteType];
+      typeHelp.textContent = meta.help;
+      goalChips.innerHTML = meta.goals
+        .map((g) => `<button type="button" class="goal-chip${siteGoalEl.value === g ? " active" : ""}">${escapeHtml(g)}</button>`)
+        .join("");
+    }
+
+    goalChips.addEventListener("click", (e) => {
+      const chip = e.target.closest(".goal-chip");
+      if (!chip) return;
+      siteGoalEl.value = siteGoalEl.value === chip.textContent ? "" : chip.textContent;
+      siteGoalEl.dispatchEvent(new Event("input"));
     });
 
-    tabUpload.addEventListener("click", () => {
-      mode = "upload";
-      tabUpload.classList.add("active");
-      tabPaste.classList.remove("active");
-      resumeTextEl.style.display = "none";
-      uploadZone.style.display = "block";
+    siteGoalEl.addEventListener("input", () => {
+      goalCount.textContent = `${siteGoalEl.value.length}/${MAX_GOAL}`;
+      goalChips.querySelectorAll(".goal-chip").forEach((c) => c.classList.toggle("active", c.textContent === siteGoalEl.value));
     });
 
-    pdfInput.addEventListener("change", async () => {
-      const file = pdfInput.files[0];
-      if (!file) return;
-      uploadFilename.textContent = `Reading ${file.name}...`;
-      try {
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        let text = "";
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          let lastY = null;
-          for (const item of content.items) {
-            const y = item.transform?.[5];
-            if (lastY !== null && y !== undefined && Math.abs(y - lastY) > 2 && !text.endsWith("\n")) text += "\n";
-            text += item.str;
-            if (item.hasEOL) text += "\n";
-            else if (item.str && !item.str.endsWith(" ")) text += " ";
-            if (y !== undefined) lastY = y;
-          }
-          text += "\n";
-        }
-        pdfText = text.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-
-        if (pdfText.length < MIN_CHARS) {
-          pdfText = "";
-          uploadFilename.textContent = `Couldn't find text in ${file.name}. It may be a scanned image; paste your resume text instead.`;
-          return;
-        }
-        uploadFilename.textContent = `✓ ${file.name} (${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}, ${pdfText.length.toLocaleString()} characters)`;
-      } catch (err) {
-        pdfText = "";
-        uploadFilename.textContent = `Couldn't read that PDF: ${err.message}`;
-      }
+    document.querySelectorAll("#typeGrid .tab").forEach((card) => {
+      card.addEventListener("click", () => {
+        siteType = card.dataset.type;
+        document.querySelectorAll("#typeGrid .tab").forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+        // A goal picked from the previous type's chips no longer fits; a typed one is kept.
+        const wasChip = Object.values(SITE_TYPE_META).some((m) => m.goals.includes(siteGoalEl.value));
+        if (wasChip) siteGoalEl.value = "";
+        siteGoalEl.dispatchEvent(new Event("input"));
+        renderGoalChips();
+      });
     });
 
     document.querySelectorAll(".style-card").forEach((card) => {
@@ -336,14 +452,12 @@
       shakespearean: { label: "Shakespearean Roast", tag: "🎭 Thy doom" },
     };
 
-    // The tier is the "which one are you" hook — score-driven, independent of roast style,
-    // so it reads consistently across all four voices and is worth screenshotting on its own.
     const TIERS = [
-      { max: 2, emoji: "🚨", label: "Resume Emergency", sub: "Call it in. This one's critical." },
-      { max: 4, emoji: "🩹", label: "Needs Life Support", sub: "It has a pulse. Barely." },
-      { max: 6, emoji: "😐", label: "Mid But Fixable", sub: "Won't get tossed. Won't get callbacks either." },
-      { max: 8, emoji: "✨", label: "Actually Decent", sub: "A few tweaks from great." },
-      { max: Infinity, emoji: "🏆", label: "Recruiter's Dream", sub: "Certified hazard-free." },
+      { max: 2, emoji: "🚧", label: "404: Effort Not Found", sub: "Is this thing on?" },
+      { max: 4, emoji: "🕸️", label: "Digital Ghost Town", sub: "Visitors arrive. Visitors leave." },
+      { max: 6, emoji: "😐", label: "Template Energy", sub: "Fine. Forgettable. Fixable." },
+      { max: 8, emoji: "✨", label: "Actually Converts", sub: "A few tweaks from great." },
+      { max: Infinity, emoji: "🏆", label: "Site of the Day", sub: "Certified hazard-free." },
     ];
     function getTier(score) {
       return TIERS.find((t) => score <= t.max) || TIERS[TIERS.length - 1];
@@ -371,8 +485,8 @@
       const meta = LEVEL_META[result.style] || LEVEL_META.savage;
       const tier = getTier(result.score);
       const weakest = [...result.categories].sort((a, b) => a.score - b.score)[0];
-      const siteLine = window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin : "";
-      return `${tier.emoji} ${tier.label}: my resume scored ${result.score}/10 on Roast My Resume (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
+      const siteLine = window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin + "/website.html" : "";
+      return `${tier.emoji} ${tier.label}: my website scored ${result.score}/10 on Roast My Website (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
     }
 
     function spawnConfetti(count = 26) {
@@ -390,8 +504,6 @@
       el.innerHTML = pieces.join("");
     }
 
-    // Read once from the page's own URL, so the footer always names wherever this is actually
-    // hosted (matches the share-link logic below) instead of a hardcoded domain going stale.
     const SITE_HOST = window.location.host || "roast-my-resume-livid.vercel.app";
 
     function slide(eyebrow, body, index, total, extraClass = "") {
@@ -413,9 +525,11 @@
       currentShareText = buildShareText(result);
 
       const topFix = result.fixes[0];
-      const total = topFix ? 5 : 4;
+      const skills = result.skills || [];
+      const total = 4 + (topFix ? 1 : 0) + (skills.length ? 1 : 0);
       const isBottomTier = tier === TIERS[0];
       const isTopTier = tier === TIERS[TIERS.length - 1];
+      let n = 0;
 
       const slides = [
         slide(
@@ -423,15 +537,15 @@
           `<span class="wrapped-tier"><span class="wrapped-tier-emoji">${tier.emoji}</span>${escapeHtml(tier.label)}</span>
            <div><span class="wrapped-score-num${isBottomTier ? " shake" : ""}">${result.score}</span><span class="wrapped-score-den">/10</span></div>
            <p class="wrapped-tier-sub">${escapeHtml(tier.sub)}</p>
-           <span class="wrapped-score-tag">${meta.tag}</span>
+           <span class="wrapped-site">${escapeHtml(result.domain)} · ${escapeHtml(result.siteTypeLabel)}</span>
            <p class="wrapped-headline">${escapeHtml(result.headline)}</p>`,
-          1, total
+          ++n, total
         ),
         slide(
           "The verdict",
           `<span class="wrapped-quote-mark">"</span>
            <p class="wrapped-quote">${escapeHtml(result.roast)}</p>`,
-          2, total
+          ++n, total
         ),
         slide(
           "The breakdown",
@@ -442,22 +556,36 @@
                  <div class="wrapped-bar-track"><div class="wrapped-bar-fill" style="width:${c.score * 10}%"></div></div>
                </div>`).join("")}
            </div>`,
-          3, total
+          ++n, total
         ),
       ];
 
       if (topFix) {
+        const isAdd = topFix.kind === "add";
         slides.push(
           slide(
             "The glow-up",
             `<div class="wrapped-rewrite">
-               <span class="wrapped-rewrite-label">${escapeHtml(topFix.label)} // before</span>
-               <div class="wrapped-before">${escapeHtml(truncate(topFix.before, 150))}</div>
+               <span class="wrapped-rewrite-label">${escapeHtml(topFix.label)} // ${isAdd ? "missing" : "before"}</span>
+               <div class="wrapped-before">${escapeHtml(isAdd ? truncate(topFix.problem, 150) : truncate(topFix.before, 150))}</div>
                <div class="wrapped-arrow">↓</div>
-               <span class="wrapped-rewrite-label">after</span>
+               <span class="wrapped-rewrite-label">${isAdd ? "add this" : "after"}</span>
                <div class="wrapped-after">${escapeHtml(truncate(topFix.after, 170))}</div>
              </div>`,
-            4, total
+            ++n, total
+          )
+        );
+      }
+
+      if (skills.length) {
+        slides.push(
+          slide(
+            "Skills to level up",
+            `<p class="wrapped-tips-title">Learn these next</p>
+             <ul class="wrapped-tips-list wrapped-skill-list">
+               ${skills.map((s, i) => `<li><span class="wrapped-skill-name"><span class="wrapped-tip-num">${i + 1}</span>${escapeHtml(s.skill)}</span><span class="wrapped-skill-why">${escapeHtml(truncate(s.why, 110))}</span></li>`).join("")}
+             </ul>`,
+            ++n, total, "tips-content"
           )
         );
       }
@@ -470,7 +598,7 @@
              ${result.fixes.map((f, i) => `<li><span class="wrapped-tip-num">${i + 1}</span><span>${escapeHtml(f.problem)}</span></li>`).join("")}
            </ul>
            <button class="story-continue" id="storyContinue">See full report ↓</button>`,
-          total, total, "tips-content"
+          ++n, total, "tips-content"
         )
       );
 
@@ -487,7 +615,24 @@
       return "";
     }
 
+    // Only ever link to http(s) URLs, even though the server already filters them.
+    function safeHref(url) {
+      return /^https?:\/\//i.test(url) ? escapeHtml(url) : "#";
+    }
+
+    function linkList(links) {
+      return `<ul class="link-list">${links
+        .map((l) => `<li><a href="${safeHref(l.url)}" target="_blank" rel="noopener noreferrer nofollow">${escapeHtml(l.title)}<span class="link-domain">${escapeHtml(l.domain)} ↗</span></a></li>`)
+        .join("")}</ul>`;
+    }
+
     function buildReport(result) {
+      document.getElementById("disclaimerType").textContent = (result.siteTypeLabel || "site").toLowerCase();
+
+      document.getElementById("reportTypeNote").innerHTML = result.typeNote
+        ? `<div class="type-note">🤔 You picked <b>${escapeHtml(result.siteTypeLabel)}</b>, but: ${escapeHtml(result.typeNote)} Try again with a different type if the advice feels off.</div>`
+        : "";
+
       document.getElementById("reportCategories").innerHTML = result.categories
         .map(
           (c) => `
@@ -514,14 +659,15 @@
             <div class="report-card-head">
               <span class="report-card-title">${i + 1}. ${escapeHtml(f.problem)}</span>
             </div>
-            <p class="fix-label">${escapeHtml(f.label)} // your line</p>
-            <p class="fix-before">${escapeHtml(f.before)}</p>
-            <p class="fix-label">try this</p>
+            ${f.kind === "add"
+              ? `<p class="fix-label">${escapeHtml(f.label)} // missing from your site</p><p class="fix-add">Nothing here yet. Add a section like this:</p>`
+              : `<p class="fix-label">${escapeHtml(f.label)} // your line</p><p class="fix-before">${escapeHtml(f.before)}</p>`}
+            <p class="fix-label">${f.kind === "add" ? "add this" : "try this"}</p>
             <div class="fix-after-row">
               <p class="fix-after">${escapeHtml(f.after)}</p>
               <button class="copy-btn" data-copy="${i}">Copy</button>
             </div>
-            ${/\[[^\]]+\]/.test(f.after) ? `<p class="placeholder-hint">Replace the [brackets] with your real numbers. Don't guess.</p>` : ""}
+            ${/\[[^\]]+\]/.test(f.after) ? `<p class="placeholder-hint">Replace the [brackets] with your real details. Don't guess.</p>` : ""}
           </div>`
         )
         .join("");
@@ -537,12 +683,32 @@
           setTimeout(() => (btn.textContent = "Copy"), 1500);
         });
       });
+
+      document.getElementById("reportSkills").innerHTML = (result.skills || [])
+        .map(
+          (s, i) => `
+          <div class="report-card">
+            <div class="report-card-head"><span class="report-card-title">${i + 1}. ${escapeHtml(s.skill)}</span></div>
+            <p class="skill-why">${escapeHtml(s.why)}</p>
+            ${s.resources.length ? linkList(s.resources) : `<p class="link-empty">No guide found this time. Search "${escapeHtml(s.skill)} guide".</p>`}
+          </div>`
+        )
+        .join("");
+
+      const exemplars = result.exemplars || [];
+      document.getElementById("reportExemplars").innerHTML = exemplars.length
+        ? `${linkList(exemplars)}<p class="source-note">// found by Exa search for: "${escapeHtml(result.exemplarQuery)}". look at how they say it, don't copy what they say.</p>`
+        : `<p class="link-empty">Exa didn't return examples this time.</p>`;
+
+      document.getElementById("reportPages").innerHTML = (result.pagesRead || [result.url])
+        .map((u) => `<li>${escapeHtml(u)}</li>`)
+        .join("");
     }
 
     function escapeHtml(str) {
       const div = document.createElement("div");
       div.textContent = str;
-      return div.innerHTML;
+      return div.innerHTML.replace(/"/g, "&quot;");
     }
 
     function truncate(str, max) {
@@ -550,7 +716,6 @@
       return str.slice(0, max).trim() + "…";
     }
 
-    // Swipe left/right through slides on touch devices, in addition to tap-to-advance below.
     let touchStartX = null;
     let didSwipe = false;
     wrappedCard.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; didSwipe = false; }, { passive: true });
@@ -559,7 +724,7 @@
       const dx = e.changedTouches[0].clientX - touchStartX;
       if (Math.abs(dx) > 40) {
         goToSlide(slideIndex + (dx < 0 ? 1 : -1));
-        didSwipe = true; // suppress the click-to-advance that follows a touch, so we don't double-navigate
+        didSwipe = true;
       }
       touchStartX = null;
     });
@@ -574,10 +739,6 @@
 
     document.getElementById("storyClose").addEventListener("click", exitStoryMode);
 
-    // Single delegated handler for the whole card: buttons inside a slide (like story-continue)
-    // get first say via closest(), everything else falls through to left/right tap-to-advance.
-    // Deliberately not a separate absolute-positioned overlay — that would sit above slide content
-    // and block any interactive element rendered inside a slide, wherever it happens to be.
     wrappedCard.addEventListener("click", (e) => {
       if (didSwipe) { didSwipe = false; return; }
       if (e.target.closest(".story-close")) return;
@@ -595,14 +756,21 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    async function renderCard() {
+      return html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
+    }
+
+    function downloadCanvas(canvas) {
+      const link = document.createElement("a");
+      link.download = "roast-my-website.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
     document.getElementById("downloadBtn").addEventListener("click", async () => {
       wrappedStatus.textContent = "Rendering image...";
       try {
-        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
-        const link = document.createElement("a");
-        link.download = "roast-my-resume.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+        downloadCanvas(await renderCard());
         wrappedStatus.textContent = "Saved! Now go post it.";
       } catch (err) {
         wrappedStatus.textContent = "Couldn't render image: " + err.message;
@@ -612,32 +780,21 @@
     document.getElementById("shareBtn").addEventListener("click", async () => {
       wrappedStatus.textContent = "Preparing share...";
       try {
-        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
+        const canvas = await renderCard();
         const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-        const file = new File([blob], "roast-my-resume.png", { type: "image/png" });
-        const shareText = currentShareText || "My resume just got roasted 🔥";
-        const sharePayload = { files: [file], title: "Roast My Resume", text: shareText };
+        const file = new File([blob], "roast-my-website.png", { type: "image/png" });
+        const shareText = currentShareText || "My website just got roasted 🔥";
+        const sharePayload = { files: [file], title: "Roast My Website", text: shareText };
 
         if (navigator.canShare && navigator.canShare(sharePayload)) {
-          // Image + copywriting together, in one native share sheet.
           await navigator.share(sharePayload);
           wrappedStatus.textContent = "Shared!";
         } else if (navigator.share) {
-          // Device can't attach the file to a share sheet — still send the copywriting,
-          // and hand over the image separately so nothing is lost.
-          const link = document.createElement("a");
-          link.download = "roast-my-resume.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-          await navigator.share({ title: "Roast My Resume", text: shareText });
+          downloadCanvas(canvas);
+          await navigator.share({ title: "Roast My Website", text: shareText });
           wrappedStatus.textContent = "Image downloaded, caption shared!";
         } else {
-          // No native share sheet (most desktop browsers) — download the image and
-          // copy the caption so the user can paste both into whatever they're using.
-          const link = document.createElement("a");
-          link.download = "roast-my-resume.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
+          downloadCanvas(canvas);
           try {
             await navigator.clipboard.writeText(shareText);
             wrappedStatus.textContent = "Image downloaded + caption copied to clipboard!";
@@ -646,11 +803,7 @@
           }
         }
       } catch (err) {
-        if (err.name !== "AbortError") {
-          wrappedStatus.textContent = "Couldn't share: " + err.message;
-        } else {
-          wrappedStatus.textContent = "";
-        }
+        wrappedStatus.textContent = err.name !== "AbortError" ? "Couldn't share: " + err.message : "";
       }
     });
 
@@ -660,16 +813,17 @@
     const loadingSubstep = document.getElementById("loadingSubstep");
 
     const LOADING_STEPS = [
-      "📄 Reading your resume...",
-      "🔍 Analyzing against recruiter standards...",
-      "🧮 Scoring impact, clarity, ATS fit...",
+      "🌐 Visiting your site...",
+      "📑 Reading every page we can find...",
+      "🔍 Judging it like your target visitor...",
+      "🧮 Scoring clarity, trust, next steps...",
       "🔥 Cooking up the roast...",
-      "✍️ Writing the verdict...",
+      "📚 Searching the web for skills to learn...",
       "📦 Plating your results...",
     ];
     const LOADING_SUBSTEPS = [
-      "// this can take up to 30 seconds. don't close the tab.",
-      "// two AI passes run here: one scores you, one roasts you.",
+      "// this can take up to 45 seconds. don't close the tab.",
+      "// Exa reads your site, then one AI scores it and another roasts it.",
       "// almost there, brace yourself.",
     ];
 
@@ -687,15 +841,15 @@
 
       loadingTimer = setInterval(() => {
         const elapsed = Date.now() - startedAt;
-        // Linear toward ~92% over ~24s, then holds so it never looks finished before it is.
-        loadingBarFill.style.width = Math.min(92, (elapsed / 24000) * 92) + "%";
+        // Linear toward ~92% over ~32s, then holds so it never looks finished before it is.
+        loadingBarFill.style.width = Math.min(92, (elapsed / 32000) * 92) + "%";
 
-        const nextStep = Math.min(LOADING_STEPS.length - 1, Math.floor(elapsed / 2600));
+        const nextStep = Math.min(LOADING_STEPS.length - 1, Math.floor(elapsed / 3200));
         if (nextStep !== stepIndex) {
           stepIndex = nextStep;
           loadingText.textContent = LOADING_STEPS[stepIndex];
         }
-        const nextSubstep = Math.min(LOADING_SUBSTEPS.length - 1, Math.floor(elapsed / 9000));
+        const nextSubstep = Math.min(LOADING_SUBSTEPS.length - 1, Math.floor(elapsed / 11000));
         if (nextSubstep !== substepIndex) {
           substepIndex = nextSubstep;
           loadingSubstep.textContent = LOADING_SUBSTEPS[substepIndex];
@@ -719,8 +873,13 @@
       }
     }
 
+    function looksLikeUrl(value) {
+      return /^(https?:\/\/)?[^\s/]+\.[^\s/]{2,}(\/\S*)?$/i.test(value);
+    }
+
     roastBtn.addEventListener("click", async () => {
-      const resumeText = mode === "upload" ? pdfText : resumeTextEl.value;
+      const url = siteUrlEl.value.trim();
+      const goal = siteGoalEl.value.trim();
       errorEl.style.display = "none";
       resultWrap.style.display = "none";
       wrappedStatus.textContent = "";
@@ -730,29 +889,22 @@
         errorEl.style.display = "block";
       };
 
-      if (!resumeText || !resumeText.trim()) {
-        return showError(mode === "upload" ? "Upload a PDF first." : "Paste your resume first.");
-      }
-      if (resumeText.trim().length < MIN_CHARS) {
-        return showError("That's too short to review. Paste your full resume.");
-      }
-      if (resumeText.length > MAX_CHARS) {
-        return showError(`That's over ${MAX_CHARS.toLocaleString()} characters. Trim it to your resume only.`);
-      }
+      if (!url) return showError("Drop your website link first.");
+      if (!looksLikeUrl(url)) return showError("That doesn't look like a website address. Try something like yoursite.com.");
+      if (goal.length > MAX_GOAL) return showError(`Keep the goal under ${MAX_GOAL} characters.`);
 
       roastBtn.disabled = true;
       roastBtn.textContent = "Roasting...";
       startLoading();
 
       try {
-        const res = await fetch("/api/roast", {
+        const res = await fetch("/api/roast-website", {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-Device-Id": deviceId() },
-          body: JSON.stringify({ resumeText, style: level }),
+          body: JSON.stringify({ url, siteType, goal, style: level }),
         });
         const data = await res.json();
 
-        // Shown once, in the limit note under the button.
         if (res.status === 429) {
           stopLoading(false);
           limitNote.textContent = `🔒 ${data.error}`;
@@ -764,8 +916,8 @@
 
         if (typeof data.remainingToday === "number") {
           limitNote.textContent = data.remainingToday > 0
-            ? `// ${data.remainingToday} roast${data.remainingToday === 1 ? "" : "s"} left today.`
-            : "// that was today's roast. come back tomorrow for another.";
+            ? `// ${data.remainingToday} website roast${data.remainingToday === 1 ? "" : "s"} left today.`
+            : "// that was today's website roast. come back tomorrow for another.";
         }
 
         stopLoading(true);
@@ -774,20 +926,17 @@
         saveLastResult(data);
         hideRevisitBanner();
 
-        // Reveal as a fullscreen story first; exitStoryMode() switches it to the inline layout.
         resultWrap.style.display = "flex";
         document.body.classList.add("story-mode");
       } catch (err) {
         stopLoading(false);
-        errorEl.textContent = err.message;
-        errorEl.style.display = "block";
+        showError(err.message);
       } finally {
         roastBtn.disabled = false;
         roastBtn.textContent = "Ignite Roast →";
       }
     });
 
-    // Revisit banner: offers the last roast this device saved, even days later.
     const revisitBanner = document.getElementById("revisitBanner");
     const revisitDate = document.getElementById("revisitDate");
     const revisitMeta = document.getElementById("revisitMeta");
@@ -797,10 +946,9 @@
     }
 
     function showRevisitBanner(saved) {
-      const meta = LEVEL_META[saved.style] || LEVEL_META.savage;
       const tier = getTier(saved.score);
       revisitDate.textContent = new Date(saved.savedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-      revisitMeta.textContent = `${tier.emoji} ${tier.label} · ${saved.score}/10 · ${meta.label}`;
+      revisitMeta.textContent = `${tier.emoji} ${saved.score}/10 · ${saved.domain}`;
       revisitBanner.classList.add("show");
     }
 
@@ -818,8 +966,9 @@
       hideRevisitBanner();
     });
 
+    renderGoalChips();
     const savedResult = loadLastResult();
-    if (savedResult) showRevisitBanner(savedResult);
+    if (savedResult?.domain) showRevisitBanner(savedResult);
   </script>
 </body>
 </html>
