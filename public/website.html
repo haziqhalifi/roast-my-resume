@@ -72,7 +72,26 @@
   }
   .fix-add { font-size: 0.86rem; color: #6b6b70; font-style: italic; margin: 0; }
 
+  .skill-summary { font-size: 0.84rem; line-height: 1.45; color: #4b4b4f; margin: 6px 0 0; }
   .skill-why { font-size: 0.86rem; line-height: 1.45; color: #2b2b2e; margin: 6px 0 0; }
+  .agent-skill { border: 2px solid var(--black); padding: 9px 10px; margin-top: 8px; background: #fff; }
+  .agent-skill-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .agent-skill-head a { font-weight: 900; font-size: 0.88rem; color: var(--black); }
+  .agent-skill-head .link-domain { margin: 0; }
+  .agent-skill-does { font-size: 0.8rem; line-height: 1.4; color: #4b4b4f; margin: 4px 0 8px; }
+  .agent-install { display: flex; gap: 8px; align-items: stretch; }
+  .agent-install code {
+    flex: 1;
+    min-width: 0;
+    background: var(--black);
+    color: var(--yellow);
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.7rem;
+    padding: 8px 9px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .skills-intro { font-size: 0.8rem; color: #4b4b4f; line-height: 1.45; margin: -4px 0 10px; }
   .link-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .link-list a {
     display: block;
@@ -271,6 +290,7 @@
         <h3 class="report-sub">Fix these first</h3>
         <div id="reportFixes"></div>
         <h3 class="report-sub">Skills to level up</h3>
+        <p class="skills-intro">Learn it yourself with the free guides, or install the AI agent skill so Claude Code, Cursor or Codex can apply it to your site. Install commands use the <a href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener">skills CLI</a>; run them in your site's project folder.</p>
         <div id="reportSkills"></div>
         <h3 class="report-sub">Sites like yours to study</h3>
         <div class="report-card" id="reportExemplars"></div>
@@ -279,7 +299,7 @@
         <p class="disclaimer">
           We judge the words and links on your site against what a <span id="disclaimerType">site like yours</span> needs to do.
           We can't see colors, layout, images or load speed, so none of that is scored. Every quote was checked against your site's text;
-          learning links and example sites come from Exa search, not from the AI, but we haven't vetted each one.
+          skills, guides and agent skills come from a list we researched and checked by hand, never from the AI. Example sites come from a live Exa search and aren't vetted.
         </p>
         <a class="how-link mono on-light" href="/how-it-works.html#website">// how we roast you ↗</a>
       </section>
@@ -684,16 +704,46 @@
         });
       });
 
-      document.getElementById("reportSkills").innerHTML = (result.skills || [])
-        .map(
-          (s, i) => `
+      // Older saved roasts stored search results as `resources`; newer ones carry catalog `learn` + `agent`.
+      const skillsList = result.skills || [];
+      document.getElementById("reportSkills").innerHTML = skillsList
+        .map((s, i) => {
+          const learn = s.learn || s.resources || [];
+          const agent = s.agent || [];
+          return `
           <div class="report-card">
             <div class="report-card-head"><span class="report-card-title">${i + 1}. ${escapeHtml(s.skill)}</span></div>
-            <p class="skill-why">${escapeHtml(s.why)}</p>
-            ${s.resources.length ? linkList(s.resources) : `<p class="link-empty">No guide found this time. Search "${escapeHtml(s.skill)} guide".</p>`}
-          </div>`
-        )
+            ${s.summary ? `<p class="skill-summary">${escapeHtml(s.summary)}</p>` : ""}
+            <p class="skill-why"><b>Why you:</b> ${escapeHtml(s.why)}</p>
+            ${learn.length ? `<p class="fix-label">learn it</p>${linkList(learn)}` : ""}
+            ${agent.length ? `<p class="fix-label">or have your AI do it</p>${agent.map((a, j) => `
+              <div class="agent-skill">
+                <div class="agent-skill-head">
+                  <a href="${safeHref(a.url)}" target="_blank" rel="noopener noreferrer nofollow">${escapeHtml(a.name)}</a>
+                  <span class="link-domain">${escapeHtml(a.source)}</span>
+                </div>
+                <p class="agent-skill-does">${escapeHtml(a.does)}</p>
+                <div class="agent-install">
+                  <code>${escapeHtml(a.install)}</code>
+                  <button class="copy-btn" data-install="${i}-${j}">Copy</button>
+                </div>
+              </div>`).join("")}` : ""}
+          </div>`;
+        })
         .join("");
+
+      document.querySelectorAll("#reportSkills [data-install]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const [i, j] = btn.dataset.install.split("-").map(Number);
+          try {
+            await navigator.clipboard.writeText(skillsList[i].agent[j].install);
+            btn.textContent = "Copied";
+          } catch {
+            btn.textContent = "Failed";
+          }
+          setTimeout(() => (btn.textContent = "Copy"), 1500);
+        });
+      });
 
       const exemplars = result.exemplars || [];
       document.getElementById("reportExemplars").innerHTML = exemplars.length
@@ -818,7 +868,7 @@
       "🔍 Judging it like your target visitor...",
       "🧮 Scoring clarity, trust, next steps...",
       "🔥 Cooking up the roast...",
-      "📚 Searching the web for skills to learn...",
+      "📚 Picking the skills you need next...",
       "📦 Plating your results...",
     ];
     const LOADING_SUBSTEPS = [
