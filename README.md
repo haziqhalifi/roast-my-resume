@@ -1,8 +1,11 @@
-# Roast My Resume 🔥
+# Roast Me 🔥
 
-**Live: [https://roast-my-resume-livid.vercel.app/](https://roast-my-resume-livid.vercel.app/)**
+**Live: [https://roast-me-savage.vercel.app/](https://roast-me-savage.vercel.app/)**
 
-Paste your resume, pick a roast style (savage, corporate, constructive, shakespearean), and get a shareable roast plus a rubric-based review you can act on.
+Two roasters behind one landing page (`/`):
+
+- **Roast My Resume** (`/resume.html`): paste your resume, pick a roast style (savage, corporate, constructive, shakespearean), and get a shareable roast plus a rubric-based review you can act on.
+- **Roast My Website** (`/website.html`): drop a link, say what kind of site it is, and get a roast, fixes, skills to learn and sites to study. See [Roast My Website](#roast-my-website) below.
 
 ## How the feedback is produced
 
@@ -84,7 +87,7 @@ To provision Redis on a new project: `vercel integration add upstash/upstash-kv`
    ```
    npm start
    ```
-6. Open http://localhost:3000 (resume) or http://localhost:3000/website.html (website)
+6. Open http://localhost:3000 and pick a roaster
 
 ## Stack
 

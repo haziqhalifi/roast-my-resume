@@ -918,4 +918,5 @@ body.story-mode .story-continue { display: inline-flex; }
   white-space: nowrap;
 }
 .placeholder-hint { font-size: 0.74rem; color: var(--muted); margin: 6px 0 0; }
+a.archive-icon { text-decoration: none; }
 .how-link.cross-link { display: table; margin-top: 8px; color: #fff; }
