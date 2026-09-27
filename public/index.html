@@ -3,823 +3,154 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roast My Resume 🔥</title>
+<title>Roast Me 🔥</title>
+<meta name="description" content="Get your resume or website roasted by AI, then get the fixes to make it better." />
 <link rel="stylesheet" href="/roast.css" />
+<style>
+  .pick-list { display: flex; flex-direction: column; gap: 14px; }
+  .pick-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border: 2px solid var(--black);
+    box-shadow: 4px 4px 0 var(--black);
+    padding: 18px 16px;
+    color: var(--black);
+    text-decoration: none;
+    transition: transform 0.05s ease;
+  }
+  .pick-card:hover { background: var(--yellow); }
+  .pick-card:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--black); }
+  .pick-emoji { font-size: 2rem; flex-shrink: 0; }
+  .pick-body { flex: 1; min-width: 0; }
+  .pick-title { font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: -0.01em; }
+  .pick-desc { font-size: 0.86rem; color: #4b4b4f; margin-top: 4px; line-height: 1.4; }
+  .pick-tag { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 0.68rem; color: var(--muted); margin-top: 6px; display: block; }
+  .pick-card:hover .pick-tag { color: #4b4b4f; }
+  .pick-arrow {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    background: var(--red);
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--black);
+  }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .steps li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #fff;
+    border: 2px solid var(--black);
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .steps b { display: block; text-transform: uppercase; font-size: 0.85rem; font-weight: 900; }
+  .step-num {
+    background: var(--black);
+    color: var(--yellow);
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 3px 7px;
+    flex-shrink: 0;
+  }
+</style>
 </head>
 <body>
   <header>
     <div class="header-top">
       <span class="badge mono">v1.0 // CERTIFIED HAZARD</span>
-      <div class="archive-icon">🗄</div>
+      <div class="archive-icon">🔥</div>
     </div>
-    <h1>ROAST<br>MY<br><span class="highlight">RESUME<span class="asterisk">✱</span></span></h1>
-    <p class="subtitle">✱ side effects may include career reconsideration, mild sweating, and going viral.</p>
+    <h1>ROAST<br><span class="highlight">ME<span class="asterisk">✱</span></span></h1>
+    <p class="subtitle">✱ brutally honest AI feedback on the things that get you hired and get you customers. then the fixes, so it actually gets better.</p>
     <a class="how-link mono" href="/how-it-works.html">// how we roast you ↗</a>
-    <a class="how-link mono cross-link" href="/website.html">// roast a website instead ↗</a>
   </header>
 
   <div class="marquee">
     <div class="marquee-track">⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp; ⚠ ROAST ZONE &nbsp;&nbsp; ⚠ CAUTION &nbsp;&nbsp; ⚠ SPICY CONTENT &nbsp;&nbsp;</div>
   </div>
 
-  <div class="stats-strip" id="statsStrip">
-    <div class="stat-block">
-      <span class="stat-num" id="statRoasts">—</span>
+  <div class="stats-strip hide" id="statsStrip">
+    <div class="stat-block" id="statResumeBlock">
+      <span class="stat-num" id="statResumes">—</span>
       <span class="stat-label">resumes roasted</span>
     </div>
-    <div class="stat-divider"></div>
-    <div class="stat-block">
-      <span class="stat-num" id="statViews">—</span>
-      <span class="stat-label">people have visited</span>
+    <div class="stat-divider" id="statDivider"></div>
+    <div class="stat-block" id="statWebsiteBlock">
+      <span class="stat-num" id="statWebsites">—</span>
+      <span class="stat-label">websites roasted</span>
     </div>
   </div>
 
   <main>
-    <div class="revisit-banner" id="revisitBanner">
-      <div class="revisit-info">
-        <span class="revisit-emoji">📌</span>
-        <div>
-          <strong>Saved roast from <span id="revisitDate"></span></strong>
-          <span id="revisitMeta"></span>
-        </div>
-      </div>
-      <div class="revisit-actions">
-        <button id="revisitViewBtn">View again</button>
-        <button id="revisitDismissBtn" aria-label="Forget this roast">✕</button>
-      </div>
-    </div>
-
     <div class="section-label">
       <span class="section-num mono">01</span>
-      <h2 class="section-title">Feed the machine</h2>
+      <h2 class="section-title">Pick your victim</h2>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" id="tabPaste">
-        <span class="icon">✏️</span>
-        <span>Paste Text</span>
-      </div>
-      <div class="tab" id="tabUpload">
-        <span class="icon">📄</span>
-        <span>Upload PDF</span>
-      </div>
+    <div class="pick-list">
+      <a class="pick-card" href="/resume.html">
+        <span class="pick-emoji">📄</span>
+        <span class="pick-body">
+          <span class="pick-title">Roast my resume</span>
+          <span class="pick-desc">Paste it or upload a PDF. Scored like a recruiter would, with line-by-line rewrites.</span>
+          <span class="pick-tag">// impact · ATS · clarity · skills</span>
+        </span>
+        <span class="pick-arrow">→</span>
+      </a>
+
+      <a class="pick-card" href="/website.html">
+        <span class="pick-emoji">🌐</span>
+        <span class="pick-body">
+          <span class="pick-title">Roast my website</span>
+          <span class="pick-desc">Drop a link. Judged on what your kind of site is for, plus the skills to learn and sites to study.</span>
+          <span class="pick-tag">// portfolio · business · SaaS · store · blog</span>
+        </span>
+        <span class="pick-arrow">→</span>
+      </a>
     </div>
 
-    <textarea id="resumeText" placeholder="Paste your resume here. Every buzzword, every 'synergy', every 'passionate about'..."></textarea>
-
-    <div class="upload-zone" id="uploadZone" style="display:none; margin-top: 0;">
-      <input type="file" id="pdfInput" accept="application/pdf" />
-      <label for="pdfInput">Choose PDF</label>
-      <div class="upload-filename" id="uploadFilename">No file chosen yet.</div>
-    </div>
-
-    <div class="section-label" style="margin-top: 28px;">
+    <div class="section-label" style="margin-top: 32px;">
       <span class="section-num mono">02</span>
-      <h2 class="section-title">Pick your poison</h2>
+      <h2 class="section-title">What you get</h2>
     </div>
 
-    <div class="styles" id="styles">
-      <div class="style-card active" data-level="savage">
-        <div class="style-check"></div>
-        <div class="style-body">
-          <div class="style-title-row">
-            <span class="style-name">🔥 Savage</span>
-            <span class="style-tag">// NO MERCY</span>
-          </div>
-          <div class="style-desc">Ruthless comedy club roast. Zero mercy.</div>
-        </div>
-      </div>
+    <ol class="steps">
+      <li><span class="step-num mono">A</span><span><b>A score you can't argue with</b>A fixed rubric, scored the same way every time, no matter which roast style you pick.</span></li>
+      <li><span class="step-num mono">B</span><span><b>The roast</b>Savage, corporate, constructive or Shakespearean. Built only from real problems we found.</span></li>
+      <li><span class="step-num mono">C</span><span><b>The fixes</b>Rewrites you can copy. Every quote is checked against your actual text, and nothing is made up.</span></li>
+    </ol>
 
-      <div class="style-card" data-level="corporate">
-        <div class="style-check"></div>
-        <div class="style-body">
-          <div class="style-title-row">
-            <span class="style-name">💼 Corporate</span>
-            <span class="style-tag">// HR APPROVED</span>
-          </div>
-          <div class="style-desc">Passive-aggressive LinkedIn energy.</div>
-        </div>
-      </div>
-
-      <div class="style-card" data-level="constructive">
-        <div class="style-check"></div>
-        <div class="style-body">
-          <div class="style-title-row">
-            <span class="style-name">🛠️ Constructive</span>
-            <span class="style-tag">// ACTIONABLE</span>
-          </div>
-          <div class="style-desc">Real talk, real tips. Still stings a little.</div>
-        </div>
-      </div>
-
-      <div class="style-card" data-level="shakespearean">
-        <div class="style-check"></div>
-        <div class="style-body">
-          <div class="style-title-row">
-            <span class="style-name">🎭 Shakespearean</span>
-            <span class="style-tag">// THY DOOM</span>
-          </div>
-          <div class="style-desc">Bardic drama. Forsooth, thou art cooked.</div>
-        </div>
-      </div>
-    </div>
-
-    <button id="roastBtn">Ignite Roast →</button>
-
-    <div id="loadingPanel" role="status" aria-live="polite">
-      <span class="loading-badge mono">v1.0 // CERTIFIED HAZARD</span>
-      <div class="loading-emoji">🔥</div>
-      <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
-      <div class="loading-status">
-        <span class="loading-dot"></span>
-        <span class="loading-text" id="loadingText">Reading your resume...</span>
-      </div>
-      <p class="loading-substep" id="loadingSubstep">// this can take up to 30 seconds. don't close the tab.</p>
-    </div>
-
-    <p class="footnote" id="limitNote">// one roast per device per day. make it count.</p>
-    <p class="footnote">// your resume is reviewed by a third-party AI provider. we don't save it. only your dignity is at risk.</p>
-
-    <div id="error"></div>
-
-    <div id="resultWrap">
-      <div class="wrapped-card" id="wrappedCard">
-        <button class="story-close" id="storyClose" aria-label="Close">✕</button>
-        <div class="wrapped-dots" id="wrappedDots"></div>
-        <div class="wrapped-confetti" id="wrappedConfetti"></div>
-        <div class="wrapped-slides" id="wrappedSlides"></div>
-      </div>
-
-      <div class="wrapped-actions">
-        <button id="downloadBtn">⬇ Download</button>
-        <button id="shareBtn" class="primary">↗ Share</button>
-      </div>
-      <p class="wrapped-status" id="wrappedStatus"></p>
-      <button class="wrapped-again" id="roastAgainBtn">↺ Roast again</button>
-
-      <section id="report">
-        <div class="section-label">
-          <span class="section-num mono">03</span>
-          <h2 class="section-title">The full report</h2>
-        </div>
-        <div id="reportCategories"></div>
-        <h3 class="report-sub">What's working</h3>
-        <div class="report-card"><ul class="report-strengths" id="reportStrengths"></ul></div>
-        <h3 class="report-sub">Fix these first</h3>
-        <div id="reportFixes"></div>
-        <p class="disclaimer">
-          Scored against common recruiter and applicant-tracking-system (ATS) guidelines: impact, readability, clarity, consistency and skills.
-          AI-generated feedback, not professional career advice. Every quote above was checked against your resume; double-check rewrites before you apply.
-        </p>
-        <a class="how-link mono on-light" href="/how-it-works.html">// how we roast you ↗</a>
-      </section>
-    </div>
+    <p class="footnote">// one free roast of each per device per day. make them count.</p>
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    if (window["pdfjsLib"]) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    }
-
-    // Social-proof strip: fire a page-view beacon (cheap, no model call, not rate-limited)
-    // and pull the running totals. Hide the strip entirely rather than show a broken "—".
+    // Running totals for both roasters. Each block hides on its own if its numbers can't load.
     (function () {
-      try {
-        if (navigator.sendBeacon) navigator.sendBeacon("/api/view");
-        else fetch("/api/view", { method: "POST", keepalive: true }).catch(() => {});
-      } catch {
-        // A missed view tick is cosmetic only.
-      }
-
-      fetch("/api/public-stats")
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then((data) => {
-          document.getElementById("statRoasts").textContent = (data.totalRoasts ?? 0).toLocaleString();
-          document.getElementById("statViews").textContent = (data.totalViews ?? 0).toLocaleString();
-        })
-        .catch(() => {
-          document.getElementById("statsStrip")?.classList.add("hide");
-        });
+      const load = (url) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject()));
+      Promise.allSettled([load("/api/public-stats"), load("/api/public-stats?app=website")]).then(([resume, website]) => {
+        const show = (result, numId, blockId) => {
+          if (result.status !== "fulfilled") {
+            document.getElementById(blockId).style.display = "none";
+            return false;
+          }
+          document.getElementById(numId).textContent = (result.value.totalRoasts ?? 0).toLocaleString();
+          return true;
+        };
+        const a = show(resume, "statResumes", "statResumeBlock");
+        const b = show(website, "statWebsites", "statWebsiteBlock");
+        if (!(a && b)) document.getElementById("statDivider").style.display = "none";
+        if (a || b) document.getElementById("statsStrip").classList.remove("hide");
+      });
     })();
-
-    const MIN_CHARS = 150;
-    const MAX_CHARS = 20000;
-
-    // Per-browser id so one device gets one roast a day. Not security: the server also limits per IP and per day.
-    function deviceId() {
-      try {
-        let id = localStorage.getItem("rmr-device-id");
-        if (!id) {
-          id = crypto.randomUUID();
-          localStorage.setItem("rmr-device-id", id);
-        }
-        return id;
-      } catch {
-        return "no-storage";
-      }
-    }
-
-    // Keeps the last roast on this device (not the server) so it's there again days later.
-    const LAST_RESULT_KEY = "rmr-last-result";
-
-    function saveLastResult(result) {
-      try {
-        localStorage.setItem(LAST_RESULT_KEY, JSON.stringify({ ...result, savedAt: Date.now() }));
-      } catch {
-        // Private browsing or storage disabled: revisiting just won't be available.
-      }
-    }
-
-    function loadLastResult() {
-      try {
-        const raw = localStorage.getItem(LAST_RESULT_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch {
-        return null;
-      }
-    }
-
-    function clearLastResult() {
-      try {
-        localStorage.removeItem(LAST_RESULT_KEY);
-      } catch {
-        // Nothing to clear if storage never worked.
-      }
-    }
-
-    let level = "savage";
-    let mode = "paste";
-    let pdfText = "";
-
-    const resumeTextEl = document.getElementById("resumeText");
-    const uploadZone = document.getElementById("uploadZone");
-    const tabPaste = document.getElementById("tabPaste");
-    const tabUpload = document.getElementById("tabUpload");
-    const pdfInput = document.getElementById("pdfInput");
-    const uploadFilename = document.getElementById("uploadFilename");
-
-    tabPaste.addEventListener("click", () => {
-      mode = "paste";
-      tabPaste.classList.add("active");
-      tabUpload.classList.remove("active");
-      resumeTextEl.style.display = "block";
-      uploadZone.style.display = "none";
-    });
-
-    tabUpload.addEventListener("click", () => {
-      mode = "upload";
-      tabUpload.classList.add("active");
-      tabPaste.classList.remove("active");
-      resumeTextEl.style.display = "none";
-      uploadZone.style.display = "block";
-    });
-
-    pdfInput.addEventListener("change", async () => {
-      const file = pdfInput.files[0];
-      if (!file) return;
-      uploadFilename.textContent = `Reading ${file.name}...`;
-      try {
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        let text = "";
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          let lastY = null;
-          for (const item of content.items) {
-            const y = item.transform?.[5];
-            if (lastY !== null && y !== undefined && Math.abs(y - lastY) > 2 && !text.endsWith("\n")) text += "\n";
-            text += item.str;
-            if (item.hasEOL) text += "\n";
-            else if (item.str && !item.str.endsWith(" ")) text += " ";
-            if (y !== undefined) lastY = y;
-          }
-          text += "\n";
-        }
-        pdfText = text.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-
-        if (pdfText.length < MIN_CHARS) {
-          pdfText = "";
-          uploadFilename.textContent = `Couldn't find text in ${file.name}. It may be a scanned image; paste your resume text instead.`;
-          return;
-        }
-        uploadFilename.textContent = `✓ ${file.name} (${pdf.numPages} page${pdf.numPages > 1 ? "s" : ""}, ${pdfText.length.toLocaleString()} characters)`;
-      } catch (err) {
-        pdfText = "";
-        uploadFilename.textContent = `Couldn't read that PDF: ${err.message}`;
-      }
-    });
-
-    document.querySelectorAll(".style-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        level = card.dataset.level;
-        document.querySelectorAll(".style-card").forEach((c) => c.classList.remove("active"));
-        card.classList.add("active");
-      });
-    });
-
-    const roastBtn = document.getElementById("roastBtn");
-    const errorEl = document.getElementById("error");
-    const resultWrap = document.getElementById("resultWrap");
-    const wrappedCard = document.getElementById("wrappedCard");
-    const wrappedSlides = document.getElementById("wrappedSlides");
-    const wrappedDots = document.getElementById("wrappedDots");
-    const wrappedStatus = document.getElementById("wrappedStatus");
-    const limitNote = document.getElementById("limitNote");
-
-    const LEVEL_META = {
-      savage: { label: "Savage Roast", tag: "🔥 No mercy" },
-      corporate: { label: "Corporate Roast", tag: "💼 HR approved" },
-      constructive: { label: "Constructive Roast", tag: "🛠️ Actionable" },
-      shakespearean: { label: "Shakespearean Roast", tag: "🎭 Thy doom" },
-    };
-
-    // The tier is the "which one are you" hook — score-driven, independent of roast style,
-    // so it reads consistently across all four voices and is worth screenshotting on its own.
-    const TIERS = [
-      { max: 2, emoji: "🚨", label: "Resume Emergency", sub: "Call it in. This one's critical." },
-      { max: 4, emoji: "🩹", label: "Needs Life Support", sub: "It has a pulse. Barely." },
-      { max: 6, emoji: "😐", label: "Mid But Fixable", sub: "Won't get tossed. Won't get callbacks either." },
-      { max: 8, emoji: "✨", label: "Actually Decent", sub: "A few tweaks from great." },
-      { max: Infinity, emoji: "🏆", label: "Recruiter's Dream", sub: "Certified hazard-free." },
-    ];
-    function getTier(score) {
-      return TIERS.find((t) => score <= t.max) || TIERS[TIERS.length - 1];
-    }
-
-    let slideIndex = 0;
-
-    function goToSlide(i) {
-      const slides = wrappedSlides.querySelectorAll(".wrapped-slide");
-      const dots = wrappedDots.querySelectorAll(".wrapped-dot");
-      if (!slides.length) return;
-      slideIndex = Math.max(0, Math.min(i, slides.length - 1));
-
-      slides.forEach((s, idx) => s.classList.toggle("active", idx === slideIndex));
-      dots.forEach((d, idx) => {
-        d.classList.remove("active", "done");
-        if (idx < slideIndex) d.classList.add("done");
-        if (idx === slideIndex) d.classList.add("active");
-      });
-    }
-
-    let currentShareText = "";
-
-    function buildShareText(result) {
-      const meta = LEVEL_META[result.style] || LEVEL_META.savage;
-      const tier = getTier(result.score);
-      const weakest = [...result.categories].sort((a, b) => a.score - b.score)[0];
-      const siteLine = window.location.origin && !window.location.origin.startsWith("null") ? window.location.origin : "";
-      return `${tier.emoji} ${tier.label}: my resume scored ${result.score}/10 on Roast My Resume (${meta.label}) 🔥 "${result.headline}" Weakest spot: ${weakest.label}. Get yours roasted${siteLine ? " → " + siteLine : ""}`;
-    }
-
-    function spawnConfetti(count = 26) {
-      const el = document.getElementById("wrappedConfetti");
-      if (!el) return;
-      const colors = ["#f4c81a", "#e8401e", "#ffffff", "#8fc6ff", "#24d68f"];
-      const pieces = Array.from({ length: count }, (_, i) => {
-        const left = Math.random() * 100;
-        const bg = colors[i % colors.length];
-        const delay = (Math.random() * 0.6).toFixed(2);
-        const duration = (2.2 + Math.random() * 1.2).toFixed(2);
-        const rotate = Math.floor(Math.random() * 360);
-        return `<span class="confetti-piece" style="left:${left}%;background:${bg};animation-delay:${delay}s;animation-duration:${duration}s;transform:rotate(${rotate}deg)"></span>`;
-      });
-      el.innerHTML = pieces.join("");
-    }
-
-    // Read once from the page's own URL, so the footer always names wherever this is actually
-    // hosted (matches the share-link logic below) instead of a hardcoded domain going stale.
-    const SITE_HOST = window.location.host || "roast-my-resume-livid.vercel.app";
-
-    function slide(eyebrow, body, index, total, extraClass = "") {
-      return `
-        <div class="wrapped-slide">
-          <p class="wrapped-eyebrow">${eyebrow}</p>
-          <div class="wrapped-slide-content ${extraClass}">${body}</div>
-          <div class="wrapped-brand">
-            <span class="wrapped-wordmark">🔥 <b>${escapeHtml(SITE_HOST)}</b></span>
-            <span>${index}/${total}</span>
-          </div>
-        </div>`;
-    }
-
-    function buildWrapped(result) {
-      const meta = LEVEL_META[result.style] || LEVEL_META.savage;
-      const tier = getTier(result.score);
-      wrappedCard.dataset.theme = result.style;
-      currentShareText = buildShareText(result);
-
-      const topFix = result.fixes[0];
-      const total = topFix ? 5 : 4;
-      const isBottomTier = tier === TIERS[0];
-      const isTopTier = tier === TIERS[TIERS.length - 1];
-
-      const slides = [
-        slide(
-          meta.label,
-          `<span class="wrapped-tier"><span class="wrapped-tier-emoji">${tier.emoji}</span>${escapeHtml(tier.label)}</span>
-           <div><span class="wrapped-score-num${isBottomTier ? " shake" : ""}">${result.score}</span><span class="wrapped-score-den">/10</span></div>
-           <p class="wrapped-tier-sub">${escapeHtml(tier.sub)}</p>
-           <span class="wrapped-score-tag">${meta.tag}</span>
-           <p class="wrapped-headline">${escapeHtml(result.headline)}</p>`,
-          1, total
-        ),
-        slide(
-          "The verdict",
-          `<span class="wrapped-quote-mark">"</span>
-           <p class="wrapped-quote">${escapeHtml(result.roast)}</p>`,
-          2, total
-        ),
-        slide(
-          "The breakdown",
-          `<div class="wrapped-bars">
-             ${result.categories.map((c) => `
-               <div>
-                 <div class="wrapped-bar-row"><span>${escapeHtml(c.label)}</span><b>${c.score}/10</b></div>
-                 <div class="wrapped-bar-track"><div class="wrapped-bar-fill" style="width:${c.score * 10}%"></div></div>
-               </div>`).join("")}
-           </div>`,
-          3, total
-        ),
-      ];
-
-      if (topFix) {
-        slides.push(
-          slide(
-            "The glow-up",
-            `<div class="wrapped-rewrite">
-               <span class="wrapped-rewrite-label">${escapeHtml(topFix.label)} // before</span>
-               <div class="wrapped-before">${escapeHtml(truncate(topFix.before, 150))}</div>
-               <div class="wrapped-arrow">↓</div>
-               <span class="wrapped-rewrite-label">after</span>
-               <div class="wrapped-after">${escapeHtml(truncate(topFix.after, 170))}</div>
-             </div>`,
-            4, total
-          )
-        );
-      }
-
-      slides.push(
-        slide(
-          "Your to-do list",
-          `<p class="wrapped-tips-title">Fix these first</p>
-           <ul class="wrapped-tips-list">
-             ${result.fixes.map((f, i) => `<li><span class="wrapped-tip-num">${i + 1}</span><span>${escapeHtml(f.problem)}</span></li>`).join("")}
-           </ul>
-           <button class="story-continue" id="storyContinue">See full report ↓</button>`,
-          total, total, "tips-content"
-        )
-      );
-
-      wrappedSlides.innerHTML = slides.join("");
-      wrappedDots.innerHTML = slides.map((_, i) => `<div class="wrapped-dot" data-index="${i}"></div>`).join("");
-      document.getElementById("wrappedConfetti").innerHTML = "";
-      if (isTopTier) spawnConfetti();
-      goToSlide(0);
-    }
-
-    function meterClass(score) {
-      if (score <= 4) return "low";
-      if (score <= 6) return "mid";
-      return "";
-    }
-
-    function buildReport(result) {
-      document.getElementById("reportCategories").innerHTML = result.categories
-        .map(
-          (c) => `
-          <div class="report-card">
-            <div class="report-card-head">
-              <span class="report-card-title">${escapeHtml(c.label)} <span class="report-weight">${Math.round(c.weight * 100)}% of score</span></span>
-              <span class="report-score">${c.score}/10</span>
-            </div>
-            <div class="report-meter"><span class="${meterClass(c.score)}" style="width:${c.score * 10}%"></span></div>
-            <p class="report-text">${escapeHtml(c.finding)}</p>
-            ${c.evidence.length ? `<ul class="report-evidence">${c.evidence.map((q) => `<li>"${escapeHtml(q)}"</li>`).join("")}</ul>` : ""}
-          </div>`
-        )
-        .join("");
-
-      document.getElementById("reportStrengths").innerHTML = result.strengths.length
-        ? result.strengths.map((s) => `<li>${escapeHtml(s)}</li>`).join("")
-        : "<li>Keep going: every section below has a clear next step.</li>";
-
-      document.getElementById("reportFixes").innerHTML = result.fixes
-        .map(
-          (f, i) => `
-          <div class="report-card">
-            <div class="report-card-head">
-              <span class="report-card-title">${i + 1}. ${escapeHtml(f.problem)}</span>
-            </div>
-            <p class="fix-label">${escapeHtml(f.label)} // your line</p>
-            <p class="fix-before">${escapeHtml(f.before)}</p>
-            <p class="fix-label">try this</p>
-            <div class="fix-after-row">
-              <p class="fix-after">${escapeHtml(f.after)}</p>
-              <button class="copy-btn" data-copy="${i}">Copy</button>
-            </div>
-            ${/\[[^\]]+\]/.test(f.after) ? `<p class="placeholder-hint">Replace the [brackets] with your real numbers. Don't guess.</p>` : ""}
-          </div>`
-        )
-        .join("");
-
-      document.querySelectorAll("#reportFixes .copy-btn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          try {
-            await navigator.clipboard.writeText(result.fixes[Number(btn.dataset.copy)].after);
-            btn.textContent = "Copied";
-          } catch {
-            btn.textContent = "Failed";
-          }
-          setTimeout(() => (btn.textContent = "Copy"), 1500);
-        });
-      });
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement("div");
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    function truncate(str, max) {
-      if (str.length <= max) return str;
-      return str.slice(0, max).trim() + "…";
-    }
-
-    // Swipe left/right through slides on touch devices, in addition to tap-to-advance below.
-    let touchStartX = null;
-    let didSwipe = false;
-    wrappedCard.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; didSwipe = false; }, { passive: true });
-    wrappedCard.addEventListener("touchend", (e) => {
-      if (touchStartX === null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 40) {
-        goToSlide(slideIndex + (dx < 0 ? 1 : -1));
-        didSwipe = true; // suppress the click-to-advance that follows a touch, so we don't double-navigate
-      }
-      touchStartX = null;
-    });
-
-    function exitStoryMode() {
-      document.body.classList.remove("story-mode");
-      resultWrap.style.display = "block";
-      requestAnimationFrame(() => {
-        document.getElementById("report").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-
-    document.getElementById("storyClose").addEventListener("click", exitStoryMode);
-
-    // Single delegated handler for the whole card: buttons inside a slide (like story-continue)
-    // get first say via closest(), everything else falls through to left/right tap-to-advance.
-    // Deliberately not a separate absolute-positioned overlay — that would sit above slide content
-    // and block any interactive element rendered inside a slide, wherever it happens to be.
-    wrappedCard.addEventListener("click", (e) => {
-      if (didSwipe) { didSwipe = false; return; }
-      if (e.target.closest(".story-close")) return;
-      if (e.target.closest("#storyContinue")) { exitStoryMode(); return; }
-      const dot = e.target.closest(".wrapped-dot");
-      if (dot) { goToSlide(Number(dot.dataset.index)); return; }
-      const rect = wrappedCard.getBoundingClientRect();
-      const isRightHalf = e.clientX - rect.left > rect.width / 2;
-      goToSlide(slideIndex + (isRightHalf ? 1 : -1));
-    });
-
-    document.getElementById("roastAgainBtn").addEventListener("click", () => {
-      resultWrap.style.display = "none";
-      document.body.classList.remove("story-mode");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    document.getElementById("downloadBtn").addEventListener("click", async () => {
-      wrappedStatus.textContent = "Rendering image...";
-      try {
-        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
-        const link = document.createElement("a");
-        link.download = "roast-my-resume.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        wrappedStatus.textContent = "Saved! Now go post it.";
-      } catch (err) {
-        wrappedStatus.textContent = "Couldn't render image: " + err.message;
-      }
-    });
-
-    document.getElementById("shareBtn").addEventListener("click", async () => {
-      wrappedStatus.textContent = "Preparing share...";
-      try {
-        const canvas = await html2canvas(wrappedCard, { backgroundColor: null, scale: 2 });
-        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-        const file = new File([blob], "roast-my-resume.png", { type: "image/png" });
-        const shareText = currentShareText || "My resume just got roasted 🔥";
-        const sharePayload = { files: [file], title: "Roast My Resume", text: shareText };
-
-        if (navigator.canShare && navigator.canShare(sharePayload)) {
-          // Image + copywriting together, in one native share sheet.
-          await navigator.share(sharePayload);
-          wrappedStatus.textContent = "Shared!";
-        } else if (navigator.share) {
-          // Device can't attach the file to a share sheet — still send the copywriting,
-          // and hand over the image separately so nothing is lost.
-          const link = document.createElement("a");
-          link.download = "roast-my-resume.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-          await navigator.share({ title: "Roast My Resume", text: shareText });
-          wrappedStatus.textContent = "Image downloaded, caption shared!";
-        } else {
-          // No native share sheet (most desktop browsers) — download the image and
-          // copy the caption so the user can paste both into whatever they're using.
-          const link = document.createElement("a");
-          link.download = "roast-my-resume.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-          try {
-            await navigator.clipboard.writeText(shareText);
-            wrappedStatus.textContent = "Image downloaded + caption copied to clipboard!";
-          } catch {
-            wrappedStatus.textContent = "Image downloaded. Caption: " + shareText;
-          }
-        }
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          wrappedStatus.textContent = "Couldn't share: " + err.message;
-        } else {
-          wrappedStatus.textContent = "";
-        }
-      }
-    });
-
-    const loadingPanel = document.getElementById("loadingPanel");
-    const loadingBarFill = document.getElementById("loadingBarFill");
-    const loadingText = document.getElementById("loadingText");
-    const loadingSubstep = document.getElementById("loadingSubstep");
-
-    const LOADING_STEPS = [
-      "📄 Reading your resume...",
-      "🔍 Analyzing against recruiter standards...",
-      "🧮 Scoring impact, clarity, ATS fit...",
-      "🔥 Cooking up the roast...",
-      "✍️ Writing the verdict...",
-      "📦 Plating your results...",
-    ];
-    const LOADING_SUBSTEPS = [
-      "// this can take up to 30 seconds. don't close the tab.",
-      "// two AI passes run here: one scores you, one roasts you.",
-      "// almost there, brace yourself.",
-    ];
-
-    let loadingTimer = null;
-
-    function startLoading() {
-      const startedAt = Date.now();
-      let stepIndex = 0;
-      let substepIndex = 0;
-      loadingPanel.classList.add("active");
-      document.body.style.overflow = "hidden";
-      loadingBarFill.style.width = "0%";
-      loadingText.textContent = LOADING_STEPS[0];
-      loadingSubstep.textContent = LOADING_SUBSTEPS[0];
-
-      loadingTimer = setInterval(() => {
-        const elapsed = Date.now() - startedAt;
-        // Linear toward ~92% over ~24s, then holds so it never looks finished before it is.
-        loadingBarFill.style.width = Math.min(92, (elapsed / 24000) * 92) + "%";
-
-        const nextStep = Math.min(LOADING_STEPS.length - 1, Math.floor(elapsed / 2600));
-        if (nextStep !== stepIndex) {
-          stepIndex = nextStep;
-          loadingText.textContent = LOADING_STEPS[stepIndex];
-        }
-        const nextSubstep = Math.min(LOADING_SUBSTEPS.length - 1, Math.floor(elapsed / 9000));
-        if (nextSubstep !== substepIndex) {
-          substepIndex = nextSubstep;
-          loadingSubstep.textContent = LOADING_SUBSTEPS[substepIndex];
-        }
-      }, 250);
-    }
-
-    function stopLoading(success) {
-      clearInterval(loadingTimer);
-      loadingTimer = null;
-      const hide = () => {
-        loadingPanel.classList.remove("active");
-        document.body.style.overflow = "";
-      };
-      if (success) {
-        loadingBarFill.style.width = "100%";
-        loadingText.textContent = "✅ Done!";
-        setTimeout(hide, 500);
-      } else {
-        hide();
-      }
-    }
-
-    roastBtn.addEventListener("click", async () => {
-      const resumeText = mode === "upload" ? pdfText : resumeTextEl.value;
-      errorEl.style.display = "none";
-      resultWrap.style.display = "none";
-      wrappedStatus.textContent = "";
-
-      const showError = (msg) => {
-        errorEl.textContent = msg;
-        errorEl.style.display = "block";
-      };
-
-      if (!resumeText || !resumeText.trim()) {
-        return showError(mode === "upload" ? "Upload a PDF first." : "Paste your resume first.");
-      }
-      if (resumeText.trim().length < MIN_CHARS) {
-        return showError("That's too short to review. Paste your full resume.");
-      }
-      if (resumeText.length > MAX_CHARS) {
-        return showError(`That's over ${MAX_CHARS.toLocaleString()} characters. Trim it to your resume only.`);
-      }
-
-      roastBtn.disabled = true;
-      roastBtn.textContent = "Roasting...";
-      startLoading();
-
-      try {
-        const res = await fetch("/api/roast", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Device-Id": deviceId() },
-          body: JSON.stringify({ resumeText, style: level }),
-        });
-        const data = await res.json();
-
-        // Shown once, in the limit note under the button.
-        if (res.status === 429) {
-          stopLoading(false);
-          limitNote.textContent = `🔒 ${data.error}`;
-          limitNote.style.color = "var(--red)";
-          limitNote.scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
-        }
-        if (!res.ok) throw new Error(data.error || "Something went wrong.");
-
-        if (typeof data.remainingToday === "number") {
-          limitNote.textContent = data.remainingToday > 0
-            ? `// ${data.remainingToday} roast${data.remainingToday === 1 ? "" : "s"} left today.`
-            : "// that was today's roast. come back tomorrow for another.";
-        }
-
-        stopLoading(true);
-        buildWrapped(data);
-        buildReport(data);
-        saveLastResult(data);
-        hideRevisitBanner();
-
-        // Reveal as a fullscreen story first; exitStoryMode() switches it to the inline layout.
-        resultWrap.style.display = "flex";
-        document.body.classList.add("story-mode");
-      } catch (err) {
-        stopLoading(false);
-        errorEl.textContent = err.message;
-        errorEl.style.display = "block";
-      } finally {
-        roastBtn.disabled = false;
-        roastBtn.textContent = "Ignite Roast →";
-      }
-    });
-
-    // Revisit banner: offers the last roast this device saved, even days later.
-    const revisitBanner = document.getElementById("revisitBanner");
-    const revisitDate = document.getElementById("revisitDate");
-    const revisitMeta = document.getElementById("revisitMeta");
-
-    function hideRevisitBanner() {
-      revisitBanner.classList.remove("show");
-    }
-
-    function showRevisitBanner(saved) {
-      const meta = LEVEL_META[saved.style] || LEVEL_META.savage;
-      const tier = getTier(saved.score);
-      revisitDate.textContent = new Date(saved.savedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-      revisitMeta.textContent = `${tier.emoji} ${tier.label} · ${saved.score}/10 · ${meta.label}`;
-      revisitBanner.classList.add("show");
-    }
-
-    document.getElementById("revisitViewBtn").addEventListener("click", () => {
-      const saved = loadLastResult();
-      if (!saved) return hideRevisitBanner();
-      buildWrapped(saved);
-      buildReport(saved);
-      resultWrap.style.display = "flex";
-      document.body.classList.add("story-mode");
-    });
-
-    document.getElementById("revisitDismissBtn").addEventListener("click", () => {
-      clearLastResult();
-      hideRevisitBanner();
-    });
-
-    const savedResult = loadLastResult();
-    if (savedResult) showRevisitBanner(savedResult);
   </script>
 </body>
 </html>
